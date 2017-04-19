@@ -2,6 +2,12 @@ language: java
 jdk:
   - oraclejdk8
 
+# update java due to bug in current travis default jdk 1.8.0_31-b13
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
+
 ## caching
 ### Caching for gradle in travis
 ### @see https://docs.travis-ci.com/user/languages/java/#Projects-Using-Gradle
