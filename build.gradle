@@ -1,0 +1,138 @@
+import io.franzbecker.gradle.lombok.task.DelombokTask
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+plugins {
+    id 'com.jfrog.bintray' version '1.7.3'
+    id 'io.franzbecker.gradle-lombok' version '1.8'
+}
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'io.franzbecker.gradle-lombok'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'com.google.guava:guava:21.0'
+    compile 'org.slf4j:slf4j-api:1.7.24'
+    compile 'org.apache.commons:commons-lang3:3.5'
+    compile 'commons-io:commons-io:2.5'
+    compile 'commons-codec:commons-codec:1.10'
+
+    compileOnly 'org.projectlombok:lombok:1.16.16'
+
+    testCompile 'org.slf4j:slf4j-simple:1.7.24'
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.hamcrest:hamcrest-all:1.3'
+    testCompile 'pl.pragmatists:JUnitParams:1.0.6'
+}
+
+lombok {
+    version = '1.16.16'
+    sha256 = 'fbf682c7ff113e5187a9c4b4cbd7a8ad782abd8ccff91b9fa7289a4a6aa8c19a'
+}
+
+task delombok(type: DelombokTask, dependsOn: compileJava) {
+    ext.outputDir = file("$buildDir/delombok")
+    outputs.dir(outputDir)
+    sourceSets.main.java.srcDirs.each {
+        inputs.dir(it)
+        args(it, '-d', outputDir)
+    }
+}
+
+task delombokHelp(type: DelombokTask) {
+    args '--help'
+}
+
+javadoc {
+    dependsOn delombok
+    source = delombok.outputDir
+    exclude 'lombok.config'
+    failOnError = false
+}
+
+tasks.withType(Jar).all { jarTask ->
+    manifest {
+        attributes(
+            'Artifact': project.name,
+            'Group': rootProject.group,
+            'Build-Version': rootProject.version
+        )
+    }
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+task allDependencies(type: DependencyReportTask) {
+
+}
+
+if (project.hasProperty('release')) {
+    bintray {
+        user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+        key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+        configurations = ['archives']
+        pkg {
+            repo = 'amv-trafficsoft-rest'
+            name = project.name
+            userOrg = user
+            licenses = ['MIT']
+            vcsUrl = 'https://github.com/amvnetworks/amv-highmobility-cryptotool-wrapper.git'
+            labels = ['amv', 'trafficsoft']
+            publicDownloadNumbers = false
+            version {
+                name = rootProject.version
+                desc = project.description
+                vcsTag = rootProject.version
+            }
+        }
+    }
+}
+
+test {
+    // * enable on demand
+    // testLogging.showStandardStreams = true
+}
+
+tasks.withType(Test) {
+    testLogging {
+        // set options for log level LIFECYCLE: STARTED, PASSED, SKIPPED, FAILED
+        events TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED
+        showExceptions true
+        exceptionFormat TestExceptionFormat.FULL
+        showCauses true
+        showStackTraces true
+
+        afterSuite { desc, result ->
+            if (!desc.parent) { // will match the outermost suite
+                def output = "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} failures, ${result.skippedTestCount} skipped)"
+                def startItem = '|  ', endItem = '  |'
+                def repeatLength = startItem.length() + output.length() + endItem.length()
+                println('\n' + ('-' * repeatLength) + '\n' + startItem + output + endItem + '\n' + ('-' * repeatLength))
+            }
+        }
+    }
+}
