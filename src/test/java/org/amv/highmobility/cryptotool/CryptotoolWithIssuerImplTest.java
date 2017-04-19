@@ -33,7 +33,7 @@ public class CryptotoolWithIssuerImplTest {
 
         CryptotoolWithIssuer.CertificateIssuer certificateIssuer = CryptotoolWithIssuer.CertificateIssuerImpl.builder()
                 .name(TestUtils.generateRandomIssuer())
-                .keys(cryptotool.generateKeys())
+                .keys(cryptotool.generateKeys().block())
                 .build();
 
         this.sut = new CryptotoolWithIssuerImpl(cryptotoolOptions, certificateIssuer);
@@ -43,8 +43,10 @@ public class CryptotoolWithIssuerImplTest {
     public void itShouldCreateAndVerifySignaturesWithSuccess() throws IOException {
         String anyMessage = RandomStringUtils.randomAlphabetic(RandomUtils.nextInt(1, 500));
 
-        Cryptotool.Signature signature = this.sut.generateSignature(anyMessage);
-        Cryptotool.Validity validity = this.sut.verifySignature(anyMessage, signature.getSignature());
+        Cryptotool.Signature signature = this.sut.generateSignature(anyMessage)
+                .block();
+        Cryptotool.Validity validity = this.sut.verifySignature(anyMessage, signature.getSignature())
+                .block();
 
         assertThat(validity, is(notNullValue()));
         assertThat(validity, is(Cryptotool.Validity.VALID));
@@ -55,7 +57,8 @@ public class CryptotoolWithIssuerImplTest {
         String appId = TestUtils.generateRandomAppId();
         String serial = TestUtils.generateRandomSerial();
 
-        Cryptotool.DeviceCertificate deviceCertificate = this.sut.createDeviceCertificate(appId, serial);
+        Cryptotool.DeviceCertificate deviceCertificate = this.sut.createDeviceCertificate(appId, serial)
+                .block();
         assertThat(deviceCertificate, is(notNullValue()));
         assertThat(deviceCertificate.getDeviceCertificate(), is(notNullValue()));
     }

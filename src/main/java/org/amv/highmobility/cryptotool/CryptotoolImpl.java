@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -32,7 +34,7 @@ public class CryptotoolImpl implements Cryptotool {
     }
 
     @Override
-    public Version version() throws IOException {
+    public Mono<Version> version() throws IOException {
         return this.execute(Command.VERSION, stringStream -> {
             String version = stringStream
                     .filter(line -> line.startsWith("Cryptotool version"))
@@ -51,7 +53,7 @@ public class CryptotoolImpl implements Cryptotool {
         });
     }
 
-    public Keys generateKeys() throws IOException {
+    public Mono<Keys> generateKeys() throws IOException {
         return this.execute(Command.KEYS, stringStream -> {
             List<String> stdOutput = stringStream.collect(toList());
 
@@ -79,7 +81,7 @@ public class CryptotoolImpl implements Cryptotool {
     }
 
     @Override
-    public Signature generateSignature(String message, String privateKey) throws IOException {
+    public Mono<Signature> generateSignature(String message, String privateKey) throws IOException {
         requireNonNull(message, "`message` must not be null");
         checkArgument(!isNullOrEmpty(privateKey), "`privateKey` must not be empty");
 
@@ -104,7 +106,7 @@ public class CryptotoolImpl implements Cryptotool {
     }
 
     @Override
-    public Validity verifySignature(String message, String signature, String publicKey) throws IOException {
+    public Mono<Validity> verifySignature(String message, String signature, String publicKey) throws IOException {
         requireNonNull(message, "`message` must not be null");
         checkArgument(!isNullOrEmpty(signature), "`signature` must not be empty");
         checkArgument(!isNullOrEmpty(publicKey), "`publicKey` must not be empty");
@@ -131,7 +133,7 @@ public class CryptotoolImpl implements Cryptotool {
     }
 
     @Override
-    public Hmac generateHmac(String message, String key) throws IOException {
+    public Mono<Hmac> generateHmac(String message, String key) throws IOException {
         requireNonNull(message, "`message` must not be null");
         checkArgument(!isNullOrEmpty(key), "`key` must not be empty");
 
@@ -156,7 +158,7 @@ public class CryptotoolImpl implements Cryptotool {
     }
 
     @Override
-    public Validity verifyHmac(String message, String key, String hmac) throws IOException {
+    public Mono<Validity> verifyHmac(String message, String key, String hmac) throws IOException {
         requireNonNull(message, "`message` must not be null");
         checkArgument(!isNullOrEmpty(key), "`key` must not be empty");
         checkArgument(!isNullOrEmpty(hmac), "`hmac` must not be empty");
@@ -183,7 +185,7 @@ public class CryptotoolImpl implements Cryptotool {
     }
 
     @Override
-    public AccessCertificate createAccessCertificate(String gainingSerial, String publicKey, String providingSerial, LocalDateTime startDate, LocalDateTime endDate, Collection<String> permissions) throws IOException {
+    public Mono<AccessCertificate> createAccessCertificate(String gainingSerial, String publicKey, String providingSerial, LocalDateTime startDate, LocalDateTime endDate, Collection<String> permissions) throws IOException {
         checkArgument(!isNullOrEmpty(gainingSerial), "`gainingSerial` must not be empty");
         checkArgument(!isNullOrEmpty(publicKey), "`publicKey` must not be empty");
         checkArgument(!isNullOrEmpty(providingSerial), "`providingSerial` must not be empty");
@@ -220,7 +222,7 @@ public class CryptotoolImpl implements Cryptotool {
     }
 
     @Override
-    public DeviceCertificate createDeviceCertificate(String issuer, String appId, String serial, String publicKey) throws IOException {
+    public Mono<DeviceCertificate> createDeviceCertificate(String issuer, String appId, String serial, String publicKey) throws IOException {
         checkArgument(!isNullOrEmpty(issuer), "`issuer` must not be empty");
         checkArgument(!isNullOrEmpty(appId), "`appId` must not be empty");
         checkArgument(!isNullOrEmpty(serial), "`serial` must not be empty");
@@ -248,11 +250,11 @@ public class CryptotoolImpl implements Cryptotool {
         });
     }
 
-    private <T> T execute(Command command, Function<Stream<String>, T> transformer) throws IOException {
+    private <T> Mono<T> execute(Command command, Function<Stream<String>, T> transformer) throws IOException {
         return execute(command, Collections.emptyList(), transformer);
     }
 
-    private <T> T execute(Command command, List<String> args, Function<Stream<String>, T> transformer) throws IOException {
+    private <T> Mono<T> execute(Command command, List<String> args, Function<Stream<String>, T> transformer) throws IOException {
         requireNonNull(command);
         requireNonNull(args);
         requireNonNull(transformer);
@@ -281,7 +283,7 @@ public class CryptotoolImpl implements Cryptotool {
                 .filter(isEmptyLine.negate())
                 .filter(isNewLine.negate());
 
-        return transformer.apply(stdInputStream);
+        return Mono.fromCallable(() -> transformer.apply(stdInputStream));
     }
 
     @Value

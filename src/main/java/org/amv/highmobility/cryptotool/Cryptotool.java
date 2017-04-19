@@ -1,5 +1,7 @@
 package org.amv.highmobility.cryptotool;
 
+import reactor.core.publisher.Mono;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -9,19 +11,19 @@ import java.util.stream.Stream;
 
 public interface Cryptotool {
 
-    Version version() throws IOException;
+    Mono<Version> version() throws IOException;
 
-    Keys generateKeys() throws IOException;
+    Mono<Keys> generateKeys() throws IOException;
 
-    Signature generateSignature(String message, String privateKey) throws IOException;
+    Mono<Signature> generateSignature(String message, String privateKey) throws IOException;
 
-    Validity verifySignature(String message, String signature, String publicKey) throws IOException;
+    Mono<Validity> verifySignature(String message, String signature, String publicKey) throws IOException;
 
-    Hmac generateHmac(String message, String key) throws IOException;
+    Mono<Hmac> generateHmac(String message, String key) throws IOException;
 
-    Validity verifyHmac(String message, String key, String hmac) throws IOException;
+    Mono<Validity> verifyHmac(String message, String key, String hmac) throws IOException;
 
-    default AccessCertificate createAccessCertificate(
+    default Mono<AccessCertificate> createAccessCertificate(
             String gainingSerial,
             String publicKey,
             String providingSerial,
@@ -33,7 +35,7 @@ public interface Cryptotool {
                 Collections.emptyList());
     }
 
-    AccessCertificate createAccessCertificate(
+    Mono<AccessCertificate> createAccessCertificate(
             String gainingSerial,
             String publicKey,
             String providingSerial,
@@ -42,7 +44,7 @@ public interface Cryptotool {
             Collection<String> permissions
     ) throws IOException;
 
-    DeviceCertificate createDeviceCertificate(
+    Mono<DeviceCertificate> createDeviceCertificate(
             String issuer,
             String appId,
             String serial,

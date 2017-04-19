@@ -35,7 +35,8 @@ public class CryptotoolImplTest {
 
     @Test
     public void itShouldShowVersion() throws IOException {
-        Cryptotool.Version version = this.sut.version();
+        Cryptotool.Version version = this.sut.version()
+                .block();
 
         assertThat(version, is(notNullValue()));
         assertThat(version.getMajor(), is(notNullValue()));
@@ -46,7 +47,8 @@ public class CryptotoolImplTest {
 
     @Test
     public void itShouldGenerateKeys() throws IOException {
-        Cryptotool.Keys keys = this.sut.generateKeys();
+        Cryptotool.Keys keys = this.sut.generateKeys()
+                .block();
 
         assertThat(keys, is(notNullValue()));
         assertThat(keys.getPrivateKey(), is(notNullValue()));
@@ -55,10 +57,12 @@ public class CryptotoolImplTest {
 
     @Test
     public void itShouldGenerateSignatures() throws IOException {
-        Cryptotool.Keys keys = this.sut.generateKeys();
+        Cryptotool.Keys keys = this.sut.generateKeys()
+                .block();
 
         String anyMessage = RandomStringUtils.randomAlphabetic(RandomUtils.nextInt(1, 500));
-        Cryptotool.Signature signature = this.sut.generateSignature(anyMessage, keys.getPrivateKey());
+        Cryptotool.Signature signature = this.sut.generateSignature(anyMessage, keys.getPrivateKey())
+                .block();
 
         assertThat(signature, is(notNullValue()));
         assertThat(signature.getSignature(), is(notNullValue()));
@@ -66,12 +70,15 @@ public class CryptotoolImplTest {
 
     @Test
     public void itShouldVerifySignature() throws IOException {
-        Cryptotool.Keys keys = this.sut.generateKeys();
+        Cryptotool.Keys keys = this.sut.generateKeys()
+                .block();
 
         String anyMessage = RandomStringUtils.randomAlphabetic(RandomUtils.nextInt(1, 500));
-        Cryptotool.Signature signature = this.sut.generateSignature(anyMessage, keys.getPrivateKey());
+        Cryptotool.Signature signature = this.sut.generateSignature(anyMessage, keys.getPrivateKey())
+                .block();
 
-        Cryptotool.Validity validity = this.sut.verifySignature(anyMessage, signature.getSignature(), keys.getPublicKey());
+        Cryptotool.Validity validity = this.sut.verifySignature(anyMessage, signature.getSignature(), keys.getPublicKey())
+                .block();
 
         assertThat(validity, is(notNullValue()));
         assertThat(validity, is(Cryptotool.Validity.VALID));
@@ -79,13 +86,16 @@ public class CryptotoolImplTest {
 
     @Test
     public void itShouldFailVerifyingSignaturesWithMismatchingMessage() throws IOException {
-        Cryptotool.Keys keys = this.sut.generateKeys();
+        Cryptotool.Keys keys = this.sut.generateKeys()
+                .block();
 
         String anyMessage = RandomStringUtils.randomAlphabetic(RandomUtils.nextInt(1, 500));
-        Cryptotool.Signature signature = this.sut.generateSignature(anyMessage, keys.getPrivateKey());
+        Cryptotool.Signature signature = this.sut.generateSignature(anyMessage, keys.getPrivateKey())
+                .block();
 
         String mismatchingMessage = anyMessage + RandomStringUtils.randomAlphabetic(10);
-        Cryptotool.Validity validity = this.sut.verifySignature(mismatchingMessage, signature.getSignature(), keys.getPublicKey());
+        Cryptotool.Validity validity = this.sut.verifySignature(mismatchingMessage, signature.getSignature(), keys.getPublicKey())
+                .block();
 
         assertThat(validity, is(notNullValue()));
         assertThat(validity, is(Cryptotool.Validity.INVALID));
@@ -93,14 +103,18 @@ public class CryptotoolImplTest {
 
     @Test
     public void itShouldFailVerifyingSignaturesWithDifferentKey() throws IOException {
-        Cryptotool.Keys keys = this.sut.generateKeys();
+        Cryptotool.Keys keys = this.sut.generateKeys()
+                .block();
 
         String anyMessage = RandomStringUtils.randomAlphabetic(RandomUtils.nextInt(1, 500));
-        Cryptotool.Signature signature = this.sut.generateSignature(anyMessage, keys.getPrivateKey());
+        Cryptotool.Signature signature = this.sut.generateSignature(anyMessage, keys.getPrivateKey())
+                .block();
 
-        Cryptotool.Keys differentKeys = this.sut.generateKeys();
+        Cryptotool.Keys differentKeys = this.sut.generateKeys()
+                .block();
         Cryptotool.Validity validity = this.sut.verifySignature(anyMessage, signature.getSignature(),
-                differentKeys.getPublicKey());
+                differentKeys.getPublicKey())
+                .block();
 
         assertThat(validity, is(notNullValue()));
         assertThat(validity, is(Cryptotool.Validity.INVALID));
@@ -110,7 +124,8 @@ public class CryptotoolImplTest {
     public void itShouldGenerateHmac() throws IOException {
         String key = RandomStringUtils.randomNumeric(64);
         String anyMessage = RandomStringUtils.randomAlphabetic(RandomUtils.nextInt(1, 500));
-        Cryptotool.Hmac hmac = this.sut.generateHmac(anyMessage, key);
+        Cryptotool.Hmac hmac = this.sut.generateHmac(anyMessage, key)
+                .block();
 
         assertThat(hmac, is(notNullValue()));
         assertThat(hmac.getHmac(), is(notNullValue()));
@@ -121,8 +136,10 @@ public class CryptotoolImplTest {
         String key = RandomStringUtils.randomNumeric(64);
         String anyMessage = RandomStringUtils.randomAlphabetic(RandomUtils.nextInt(1, 500));
 
-        Cryptotool.Hmac hmac = this.sut.generateHmac(anyMessage, key);
-        Cryptotool.Validity validity = this.sut.verifyHmac(anyMessage, key, hmac.getHmac());
+        Cryptotool.Hmac hmac = this.sut.generateHmac(anyMessage, key)
+                .block();
+        Cryptotool.Validity validity = this.sut.verifyHmac(anyMessage, key, hmac.getHmac())
+                .block();
 
         assertThat(validity, is(notNullValue()));
         assertThat(validity, is(Cryptotool.Validity.VALID));
@@ -133,10 +150,12 @@ public class CryptotoolImplTest {
         String key = RandomStringUtils.randomNumeric(64);
         String anyMessage = RandomStringUtils.randomAlphabetic(RandomUtils.nextInt(1, 10));
 
-        Cryptotool.Hmac hmac = this.sut.generateHmac(anyMessage, key);
+        Cryptotool.Hmac hmac = this.sut.generateHmac(anyMessage, key)
+                .block();
 
         String mismatchingMessage = anyMessage + RandomStringUtils.randomAlphabetic(10);
-        Cryptotool.Validity validity = this.sut.verifyHmac(mismatchingMessage, key, hmac.getHmac());
+        Cryptotool.Validity validity = this.sut.verifyHmac(mismatchingMessage, key, hmac.getHmac())
+                .block();
 
         assertThat(validity, is(notNullValue()));
         assertThat(validity, is(Cryptotool.Validity.INVALID));
@@ -147,10 +166,12 @@ public class CryptotoolImplTest {
         String key = RandomStringUtils.randomNumeric(64);
         String anyMessage = RandomStringUtils.randomAlphabetic(RandomUtils.nextInt(1, 10));
 
-        Cryptotool.Hmac hmac = this.sut.generateHmac(anyMessage, key);
+        Cryptotool.Hmac hmac = this.sut.generateHmac(anyMessage, key)
+                .block();
 
         String mismatchingKey = key.substring(0, 32) + RandomStringUtils.randomAlphabetic(32);
-        Cryptotool.Validity validity = this.sut.verifyHmac(anyMessage, mismatchingKey, hmac.getHmac());
+        Cryptotool.Validity validity = this.sut.verifyHmac(anyMessage, mismatchingKey, hmac.getHmac())
+                .block();
 
         assertThat(validity, is(notNullValue()));
         assertThat(validity, is(Cryptotool.Validity.INVALID));
@@ -158,21 +179,24 @@ public class CryptotoolImplTest {
 
     @Test
     public void itShouldCreateDeviceCertificate() throws IOException {
-        Cryptotool.Keys keys = this.sut.generateKeys();
+        Cryptotool.Keys keys = this.sut.generateKeys()
+                .block();
 
         String issuer = TestUtils.generateRandomIssuer();
         String appId = TestUtils.generateRandomAppId();
         String serial = TestUtils.generateRandomSerial();
         String publicKey = keys.getPublicKey();
 
-        Cryptotool.DeviceCertificate deviceCertificate = this.sut.createDeviceCertificate(issuer, appId, serial, publicKey);
+        Cryptotool.DeviceCertificate deviceCertificate = this.sut.createDeviceCertificate(issuer, appId, serial, publicKey)
+                .block();
         assertThat(deviceCertificate, is(notNullValue()));
         assertThat(deviceCertificate.getDeviceCertificate(), is(notNullValue()));
     }
 
     @Test
     public void itShouldCreateAccessCertificate() throws IOException {
-        Cryptotool.Keys keys = this.sut.generateKeys();
+        Cryptotool.Keys keys = this.sut.generateKeys()
+                .block();
 
         String gainingSerial = TestUtils.generateRandomSerial();
         String publicKey = keys.getPublicKey();
@@ -180,7 +204,8 @@ public class CryptotoolImplTest {
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = startDate.plusYears(1);
 
-        Cryptotool.AccessCertificate accessCertificate = this.sut.createAccessCertificate(gainingSerial, publicKey, providingSerial, startDate, endDate);
+        Cryptotool.AccessCertificate accessCertificate = this.sut.createAccessCertificate(gainingSerial, publicKey, providingSerial, startDate, endDate)
+                .block();
         assertThat(accessCertificate, is(notNullValue()));
         assertThat(accessCertificate.getAccessCertificate(), is(notNullValue()));
     }

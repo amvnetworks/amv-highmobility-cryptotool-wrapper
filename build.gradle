@@ -33,6 +33,7 @@ dependencies {
     compile 'org.apache.commons:commons-lang3:3.5'
     compile 'commons-io:commons-io:2.5'
     compile 'commons-codec:commons-codec:1.10'
+    compile 'io.projectreactor:reactor-core:3.0.6.RELEASE'
 
     compileOnly 'org.projectlombok:lombok:1.16.16'
 
