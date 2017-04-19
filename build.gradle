@@ -19,7 +19,7 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: 'io.franzbecker.gradle-lombok'
 
 group = 'org.amv.highmobility'
-version = '0.0.4-SNAPSHOT'
+version = '0.0.4'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
