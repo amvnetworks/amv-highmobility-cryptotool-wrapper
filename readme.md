@@ -2,13 +2,18 @@
 amv-highmobility-cryptotool-wrapper
 ========
 
-## Development
-
-### Build
+# Development
+## Build
 ```
 $ ./gradlew clean build
 ```
-### Build & Run
+
+## Usage
 ```
-$ ./gradlew build && java -jar build/libs/amv-highmobility-cryptotool-wrapper-<version>.jar
+Cryptotool cryptotool = new CryptotoolImpl(CryptotoolOptionsImpl.builder()
+   .pathToExecutable(BinaryHelper.getCryptotoolBinary())
+   .workingDirectory(Files.createTempDir())
+   .build());
+   
+// ...
 ```
