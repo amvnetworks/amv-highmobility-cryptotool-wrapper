@@ -21,8 +21,28 @@ amv-highmobility-cryptotool-wrapper
 ```
 
 # usage
+
+## getting an instance
 ```java
 Cryptotool cryptotool = new CryptotoolImpl(CryptotoolOptionsImpl.createDefault());
    
+// ...
+```
+
+### instance initialized with issuer
+A issuer is representing a key pair (`keys`) with an optional name (`name`).
+With an `CryptotoolWithIssuer` instances you can omit the public and private keys when
+creating device certificates and signing messages.
+```java
+CryptotoolOptions cryptotoolOptions = CryptotoolOptionsImpl.createDefault();
+
+Cryptotool cryptotool = new CryptotoolImpl(cryptotoolOptions);
+
+CertificateIssuer certificateIssuer = CertificateIssuerImpl.builder()
+        .name(TestUtils.generateRandomIssuer())
+        .keys(cryptotool.generateKeys().block())
+        .build();
+
+Cryptotool cryptotoolWithIssuer = new CryptotoolWithIssuerImpl(cryptotoolOptions, certificateIssuer);
 // ...
 ```
