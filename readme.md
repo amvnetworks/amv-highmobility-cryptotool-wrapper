@@ -22,10 +22,7 @@ amv-highmobility-cryptotool-wrapper
 
 # usage
 ```java
-Cryptotool cryptotool = new CryptotoolImpl(CryptotoolOptionsImpl.builder()
-   .pathToExecutable(BinaryHelper.getCryptotoolBinary())
-   .workingDirectory(Files.createTempDir())
-   .build());
+Cryptotool cryptotool = new CryptotoolImpl(CryptotoolOptionsImpl.createDefault());
    
 // ...
 ```

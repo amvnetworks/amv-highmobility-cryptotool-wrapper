@@ -4,6 +4,7 @@ import com.google.common.io.Files;
 import org.amv.highmobility.cryptotool.CryptotoolUtils.TestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.event.Level;
@@ -25,14 +26,17 @@ public class CryptotoolImplTest {
 
     @Before
     public void setUp() throws URISyntaxException, IOException {
-        CryptotoolOptions cryptotoolOptions = CryptotoolOptionsImpl.builder()
-                .pathToExecutable(BinaryHelper.getCryptotoolBinary())
-                .workingDirectory(Files.createTempDir())
-                .build();
+        CryptotoolOptions cryptotoolOptions = CryptotoolOptionsImpl.createDefault();
 
         this.sut = new CryptotoolImpl(cryptotoolOptions);
     }
 
+    @Test
+    public void itSouldHaveAnElegantConstructionMechanism() throws Exception {
+        Cryptotool cryptotool = new CryptotoolImpl(CryptotoolOptionsImpl.createDefault());
+
+        assertThat(cryptotool, Matchers.is(Matchers.notNullValue()));
+    }
     @Test
     public void itShouldShowVersion() throws IOException {
         Cryptotool.Version version = this.sut.version()
