@@ -46,3 +46,58 @@ CertificateIssuer certificateIssuer = CertificateIssuerImpl.builder()
 Cryptotool cryptotoolWithIssuer = new CryptotoolWithIssuerImpl(cryptotoolOptions, certificateIssuer);
 // ...
 ```
+
+## commands
+
+### keys
+```java
+cryptotool.generateKeys()
+    .subscribe(keys -> {
+        log.info("public key: {}", keys.getPublicKey());
+        log.info("private key: {}", keys.getPublicKey());
+    });
+```
+
+### generate signature
+```java
+String myMessage = ...
+cryptotoolWithIssuer.generateSignature(myMessage)
+    .subscribe(signature -> {
+        log.info("signature: {}", signature.getSignature());
+    });
+```
+
+### verify signature
+```java
+String myMessage = ...
+String signature =  ...
+cryptotoolWithIssuer.verifySignature(myMessage, signature)
+    .subscribe(validity -> {
+        log.info("signature validity: {}", validity);
+    });
+```
+
+### create device certificate
+```java
+String appId = ...
+String serial = ...
+
+cryptotoolWithIssuer.createDeviceCertificate(appId, serial)
+    .subscribe(deviceCertificate -> {
+        log.info("device certificate: {}", deviceCertificate);
+    });
+```
+
+### create access certificate
+```java
+String gainingSerial = ...;
+String publicKey = ...;
+String providingSerial = ...;
+LocalDateTime startDate = LocalDateTime.now();
+LocalDateTime endDate = startDate.plusDays(1);
+
+cryptotoolWithIssuer.createAccessCertificate(gainingSerial, publicKey, providingSerial, startDate, endDate)
+    .subscribe(accessCertificate -> {
+        log.info("access certificate: {}", accessCertificate);
+    });
+```
