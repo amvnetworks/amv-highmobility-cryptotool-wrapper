@@ -3,13 +3,17 @@
 amv-highmobility-cryptotool-wrapper
 ========
 
-# Development
-## Build
+# build
 ```
-$ ./gradlew clean build
+./gradlew clean build
 ```
 
-## Usage
+## release to bintray
+```
+./gradlew clean build -Prelease -PbintrayUser=${username} -PbintrayApiKey=${apiKey} bintrayUpload
+```
+
+# usage
 ```
 Cryptotool cryptotool = new CryptotoolImpl(CryptotoolOptionsImpl.builder()
    .pathToExecutable(BinaryHelper.getCryptotoolBinary())
