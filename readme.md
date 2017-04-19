@@ -31,8 +31,8 @@ Cryptotool cryptotool = new CryptotoolImpl(CryptotoolOptionsImpl.createDefault()
 
 ### instance initialized with issuer
 A issuer is representing a key pair (`keys`) with an optional name (`name`).
-With an `CryptotoolWithIssuer` instances you can omit the public and private keys when
-creating device certificates and signing messages.
+When signing messages or creating device certificates with an instance of
+`CryptotoolWithIssuer` the public and private key params can be omitted.
 ```java
 CryptotoolOptions cryptotoolOptions = CryptotoolOptionsImpl.createDefault();
 
@@ -61,6 +61,7 @@ cryptotool.generateKeys()
 ### generate signature
 ```java
 String myMessage = ...
+
 cryptotoolWithIssuer.generateSignature(myMessage)
     .subscribe(signature -> {
         log.info("signature: {}", signature.getSignature());
@@ -71,6 +72,7 @@ cryptotoolWithIssuer.generateSignature(myMessage)
 ```java
 String myMessage = ...
 String signature =  ...
+
 cryptotoolWithIssuer.verifySignature(myMessage, signature)
     .subscribe(validity -> {
         log.info("signature validity: {}", validity);
@@ -101,3 +103,8 @@ cryptotoolWithIssuer.createAccessCertificate(gainingSerial, publicKey, providing
         log.info("access certificate: {}", accessCertificate);
     });
 ```
+
+
+# license
+The project is licensed under the MIT license. See
+[LICENSE](LICENSE) for details.
