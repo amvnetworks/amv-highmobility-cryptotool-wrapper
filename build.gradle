@@ -17,6 +17,8 @@ apply plugin: 'maven'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'io.franzbecker.gradle-lombok'
 
+group = 'org.amv.highmobility'
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
