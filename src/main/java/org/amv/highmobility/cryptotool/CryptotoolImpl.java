@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -13,14 +12,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
+import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toList;
 
 @Slf4j
 public class CryptotoolImpl implements Cryptotool {
@@ -34,49 +30,39 @@ public class CryptotoolImpl implements Cryptotool {
 
     @Override
     public Mono<Version> version() throws IOException {
-        return this.execute(Command.VERSION, stringStream -> {
-            String version = stringStream
-                    .filter(line -> line.startsWith("Cryptotool version"))
-                    .map(line -> line.replace("Cryptotool version", ""))
-                    .map(String::trim)
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("Cannot find version on stdout"));
-
-            String[] majorMinorPatch = version.split("\\.");
-
-            return VersionImpl.builder()
-                    .major(majorMinorPatch.length > 0 ? majorMinorPatch[0] : "0")
-                    .minor(majorMinorPatch.length > 1 ? majorMinorPatch[1] : "0")
-                    .patch(majorMinorPatch.length > 2 ? majorMinorPatch[2] : "0")
-                    .build();
-        });
+        String versionPrefix = "Cryptotool version";
+        return this.execute(Command.VERSION)
+                .map(processResult -> parseValueWithPrefix(versionPrefix, processResult)
+                        .orElseThrow(() -> new IllegalStateException("Cannot find version on stdout")))
+                .map(version -> {
+                    String[] majorMinorPatch = version.split("\\.");
+                    return VersionImpl.builder()
+                            .major(majorMinorPatch.length > 0 ? majorMinorPatch[0] : "0")
+                            .minor(majorMinorPatch.length > 1 ? majorMinorPatch[1] : "0")
+                            .patch(majorMinorPatch.length > 2 ? majorMinorPatch[2] : "0")
+                            .build();
+                });
     }
 
     public Mono<Keys> generateKeys() throws IOException {
-        return this.execute(Command.KEYS, stringStream -> {
-            List<String> stdOutput = stringStream.collect(toList());
+        String privateKeyPrefix = "PRIVATE: ";
+        String publicKeyPrefix = "PUBLIC: ";
 
-            String privateKeyPrefix = "PRIVATE: ";
-            String privateKey = stdOutput.stream()
-                    .filter(line -> line.startsWith(privateKeyPrefix))
-                    .map(line -> line.replace(privateKeyPrefix, ""))
-                    .map(String::trim)
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("Cannot find generated private key on stdout"));
+        return this.execute(Command.KEYS)
+                .map(process -> {
+                    List<String> stdOutput = process.getCleanedOutput();
 
-            String publicKeyPrefix = "PUBLIC: ";
-            String publicKey = stdOutput.stream()
-                    .filter(line -> line.startsWith(publicKeyPrefix))
-                    .map(line -> line.replace(publicKeyPrefix, ""))
-                    .map(String::trim)
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("Cannot find generated public key on stdout"));
+                    String privateKey = parseValueWithPrefix(privateKeyPrefix, stdOutput)
+                            .orElseThrow(() -> new IllegalStateException("Cannot find generated private key on stdout"));
 
-            return KeysImpl.builder()
-                    .privateKey(privateKey)
-                    .publicKey(publicKey)
-                    .build();
-        });
+                    String publicKey = parseValueWithPrefix(publicKeyPrefix, stdOutput)
+                            .orElseThrow(() -> new IllegalStateException("Cannot find generated public key on stdout"));
+
+                    return KeysImpl.builder()
+                            .privateKey(privateKey)
+                            .publicKey(publicKey)
+                            .build();
+                });
     }
 
     @Override
@@ -89,19 +75,13 @@ public class CryptotoolImpl implements Cryptotool {
                 .add(privateKey)
                 .build();
 
-        return this.execute(Command.CREATE_SIGNATURE, args, stringStream -> {
-            String signPrefix = "SIGNATURE: ";
-            String signature = stringStream
-                    .filter(line -> line.startsWith(signPrefix))
-                    .map(line -> line.replace(signPrefix, ""))
-                    .map(String::trim)
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("Cannot find signature on stdout"));
-
-            return SignatureImpl.builder()
-                    .signature(signature)
-                    .build();
-        });
+        String signPrefix = "SIGNATURE: ";
+        return this.execute(Command.CREATE_SIGNATURE, args)
+                .map(processResult -> parseValueWithPrefix(signPrefix, processResult)
+                        .orElseThrow(() -> new IllegalStateException("Cannot find signature on stdout")))
+                .map(signature -> SignatureImpl.builder()
+                        .signature(signature)
+                        .build());
     }
 
     @Override
@@ -116,19 +96,16 @@ public class CryptotoolImpl implements Cryptotool {
                 .add(publicKey)
                 .build();
 
-        return this.execute(Command.VERIFY_SIGNATURE, args, stringStream -> {
-            String signPrefix = "VERIFY: ";
-            Validity validity = stringStream
-                    .filter(line -> line.startsWith(signPrefix))
-                    .map(line -> line.replace(signPrefix, ""))
-                    .map(String::trim)
-                    .filter(val -> "FALSE".equals(val) || "CORRECT".equals(val))
-                    .findFirst()
-                    .map(val -> "CORRECT".equals(val) ? Validity.VALID : Validity.INVALID)
-                    .orElseThrow(() -> new IllegalStateException("Cannot find signature validity on stdout"));
-
-            return validity;
-        });
+        String signPrefix = "VERIFY: ";
+        return this.execute(Command.VERIFY_SIGNATURE, args)
+                .map(processResult -> processResult.getCleanedOutput().stream()
+                        .filter(line -> line.startsWith(signPrefix))
+                        .map(line -> line.replace(signPrefix, ""))
+                        .map(String::trim)
+                        .filter(val -> "FALSE".equals(val) || "CORRECT".equals(val))
+                        .findFirst()
+                        .map(val -> "CORRECT".equals(val) ? Validity.VALID : Validity.INVALID)
+                        .orElseThrow(() -> new IllegalStateException("Cannot find signature validity on stdout")));
     }
 
     @Override
@@ -141,19 +118,13 @@ public class CryptotoolImpl implements Cryptotool {
                 .add(key)
                 .build();
 
-        return this.execute(Command.CREATE_HMAC, args, stringStream -> {
-            String signPrefix = "HMAC: ";
-            String hmac = stringStream
-                    .filter(line -> line.startsWith(signPrefix))
-                    .map(line -> line.replace(signPrefix, ""))
-                    .map(String::trim)
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("Cannot find hmac on stdout"));
-
-            return HmacImpl.builder()
-                    .hmac(hmac)
-                    .build();
-        });
+        String signPrefix = "HMAC: ";
+        return this.execute(Command.CREATE_HMAC, args)
+                .map(result -> parseValueWithPrefix(signPrefix, result)
+                        .orElseThrow(() -> new IllegalStateException("Cannot find hmac on stdout")))
+                .map(hmac -> HmacImpl.builder()
+                        .hmac(hmac)
+                        .build());
     }
 
     @Override
@@ -168,19 +139,16 @@ public class CryptotoolImpl implements Cryptotool {
                 .add(hmac)
                 .build();
 
-        return this.execute(Command.VERIFY_HMAC, args, stringStream -> {
-            String signPrefix = "HMAC VERIFY: ";
-            Validity validity = stringStream
-                    .filter(line -> line.startsWith(signPrefix))
-                    .map(line -> line.replace(signPrefix, ""))
-                    .map(String::trim)
-                    .filter(val -> "FALSE".equals(val) || "CORRECT".equals(val))
-                    .findFirst()
-                    .map(val -> "CORRECT".equals(val) ? Validity.VALID : Validity.INVALID)
-                    .orElseThrow(() -> new IllegalStateException("Cannot find hmac validity on stdout"));
-
-            return validity;
-        });
+        String signPrefix = "HMAC VERIFY: ";
+        return this.execute(Command.VERIFY_HMAC, args)
+                .map(result -> result.getCleanedOutput().stream()
+                        .filter(line -> line.startsWith(signPrefix))
+                        .map(line -> line.replace(signPrefix, ""))
+                        .map(String::trim)
+                        .filter(val -> "FALSE".equals(val) || "CORRECT".equals(val))
+                        .findFirst()
+                        .map(val -> "CORRECT".equals(val) ? Validity.VALID : Validity.INVALID)
+                        .orElseThrow(() -> new IllegalStateException("Cannot find hmac validity on stdout")));
     }
 
     @Override
@@ -203,21 +171,15 @@ public class CryptotoolImpl implements Cryptotool {
                 .add(endDateAsString)
                 .build();
 
-        return this.execute(Command.CREATE_ACCESS_CERTIFICATE, args, stringStream -> {
-            String accessCertPrefix = "ACCESS CERT: ";
-            String accessCertificate = stringStream
-                    .filter(line -> line.startsWith(accessCertPrefix))
-                    .map(line -> line.replace(accessCertPrefix, ""))
-                    .map(String::trim)
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("Cannot find access certificate on stdout"));
-
-            return AccessCertificateImpl.builder()
-                    .accessCertificate(accessCertificate)
-                    .validityStartDate(startDate)
-                    .validityEndDate(endDate)
-                    .build();
-        });
+        String accessCertPrefix = "ACCESS CERT: ";
+        return this.execute(Command.CREATE_ACCESS_CERTIFICATE, args)
+                .map(result -> parseValueWithPrefix(accessCertPrefix, result)
+                        .orElseThrow(() -> new IllegalStateException("Cannot find access certificate on stdout")))
+                .map(accessCertificate -> AccessCertificateImpl.builder()
+                        .accessCertificate(accessCertificate)
+                        .validityStartDate(startDate)
+                        .validityEndDate(endDate)
+                        .build());
     }
 
     @Override
@@ -234,29 +196,34 @@ public class CryptotoolImpl implements Cryptotool {
                 .add(publicKey)
                 .build();
 
-        return this.execute(Command.CREATE_DEVICE_CERTIFICATE, args, stringStream -> {
-            String deviceCertPrefix = "DEVICE CERT: ";
-            String deviceCertificate = stringStream
-                    .filter(line -> line.startsWith(deviceCertPrefix))
-                    .map(line -> line.replace(deviceCertPrefix, ""))
-                    .map(String::trim)
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("Cannot find device certificate on stdout"));
-
-            return DeviceCertificateImpl.builder()
-                    .deviceCertificate(deviceCertificate)
-                    .build();
-        });
+        String deviceCertPrefix = "DEVICE CERT: ";
+        return this.execute(Command.CREATE_DEVICE_CERTIFICATE, args)
+                .map(result -> parseValueWithPrefix(deviceCertPrefix, result)
+                        .orElseThrow(() -> new IllegalStateException("Cannot find device certificate on stdout")))
+                .map(deviceCertificate -> DeviceCertificateImpl.builder()
+                        .deviceCertificate(deviceCertificate)
+                        .build());
     }
 
-    private <T> Mono<T> execute(Command command, Function<Stream<String>, T> transformer) throws IOException {
-        return execute(command, Collections.emptyList(), transformer);
+    private Optional<String> parseValueWithPrefix(String prefix, ProcessWrapper.ProcessResult processResult) {
+        return parseValueWithPrefix(prefix, processResult.getCleanedOutput());
     }
 
-    private <T> Mono<T> execute(Command command, List<String> args, Function<Stream<String>, T> transformer) throws IOException {
+    private Optional<String> parseValueWithPrefix(String prefix, List<String> output) {
+        return output.stream()
+                .filter(line -> line.startsWith(prefix))
+                .map(line -> line.replace(prefix, ""))
+                .map(String::trim)
+                .findFirst();
+    }
+
+    private Mono<ProcessWrapper.ProcessResult> execute(Command command) throws IOException {
+        return execute(command, Collections.emptyList());
+    }
+
+    private Mono<ProcessWrapper.ProcessResult> execute(Command command, List<String> args) throws IOException {
         requireNonNull(command);
         requireNonNull(args);
-        requireNonNull(transformer);
 
         ImmutableList<String> commands = ImmutableList.<String>builder()
                 .add(this.options.getPathToExecutable().getAbsolutePath())
@@ -274,16 +241,7 @@ public class CryptotoolImpl implements Cryptotool {
                     if (processResult.hasErrors() && log.isWarnEnabled()) {
                         log.warn("Found output on stderr: \n{}", processResult.getErrors());
                     }
-                })
-                .map(processResult -> {
-                    Predicate<String> isNewLine = line -> "\n".equals(line) || System.lineSeparator().equals(line);
-                    Predicate<String> isEmptyLine = StringUtils::isBlank;
-
-                    return processResult.getInfos().stream()
-                            .filter(isEmptyLine.negate())
-                            .filter(isNewLine.negate());
-                })
-                .map(transformer::apply);
+                });
     }
 
     @Value

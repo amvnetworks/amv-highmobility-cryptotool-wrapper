@@ -1,10 +1,10 @@
 package org.amv.highmobility.cryptotool;
 
-import com.google.common.io.Files;
 import org.amv.highmobility.cryptotool.CryptotoolUtils.TestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.hamcrest.Matchers;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.event.Level;
@@ -37,6 +37,7 @@ public class CryptotoolImplTest {
 
         assertThat(cryptotool, Matchers.is(Matchers.notNullValue()));
     }
+
     @Test
     public void itShouldShowVersion() throws IOException {
         Cryptotool.Version version = this.sut.version()
@@ -86,6 +87,19 @@ public class CryptotoolImplTest {
 
         assertThat(validity, is(notNullValue()));
         assertThat(validity, is(Cryptotool.Validity.VALID));
+    }
+
+
+    @Test(expected = IllegalStateException.class)
+    public void itShouldVerifySignatureFailureWithOverlongMessage() throws IOException {
+        Cryptotool.Keys keys = this.sut.generateKeys()
+                .block();
+
+        String anyMessage = RandomStringUtils.randomAlphabetic(1_000);
+        Cryptotool.Signature signature = this.sut.generateSignature(anyMessage, keys.getPrivateKey())
+                .block();
+
+        Assert.fail("Should have thrown exception");
     }
 
     @Test

@@ -2,7 +2,10 @@ package org.amv.highmobility.cryptotool;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import lombok.Builder;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.io.*;
@@ -10,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.function.Predicate;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
@@ -44,40 +48,46 @@ class ProcessWrapper {
         if (environment != null && !environment.isEmpty()) {
             pb.environment().putAll(environment);
         }
-
         return Mono.fromCallable(() -> {
             if (log.isDebugEnabled()) {
                 log.debug("Executed: {}", commands.stream().collect(joining(" ")));
             }
             return pb.start();
-        }).map(this::readProcessOutput);
+        })
+                .flatMap(this::readProcessOutput)
+                .single();
     }
 
-    private ProcessResult readProcessOutput(Process process) {
-        try {
-            ExecutorService executor = Executors.newFixedThreadPool(2);
+    private Mono<ProcessResult> readProcessOutput(Process process) {
+        return Mono.fromCallable(() -> {
+            try {
+                ExecutorService executor = Executors.newFixedThreadPool(2);
 
-            int status = process.waitFor();
-            try (InputStream stdoutStream = process.getInputStream();
-                 InputStream stderrStream = process.getErrorStream()) {
-                Future<List<String>> stdout = executor.submit(new StreamBoozer(stdoutStream));
-                Future<List<String>> stderr = executor.submit(new StreamBoozer(stderrStream));
+                int status = process.waitFor();
+                try (InputStream stdoutStream = process.getInputStream();
+                     InputStream stderrStream = process.getErrorStream()) {
+                    Future<List<String>> stdout = executor.submit(new StreamBoozer(stdoutStream));
+                    Future<List<String>> stderr = executor.submit(new StreamBoozer(stderrStream));
 
-                ProcessResult processResult = new ProcessResult(status, stdout.get(), stderr.get());
+                    ProcessResult processResult = ProcessResult.builder()
+                            .status(status)
+                            .output(stdout.get())
+                            .errors(stderr.get()).build();
 
-                executor.shutdown();
+                    executor.shutdown();
 
-                if (log.isDebugEnabled()) {
-                    log.debug("Command has terminated with status: " + processResult.getStatus());
-                    log.debug("Output:\n" + processResult.getInfos());
-                    log.debug("Error:\n" + processResult.getErrors());
+                    if (log.isDebugEnabled()) {
+                        log.debug("Command has terminated with status: " + processResult.getStatus());
+                        log.debug("Output:\n" + processResult.getOutput());
+                        log.debug("Error:\n" + processResult.getErrors());
+                    }
+
+                    return processResult;
                 }
-
-                return processResult;
+            } catch (InterruptedException | ExecutionException | IOException e) {
+                throw new RuntimeException(e);
             }
-        } catch (InterruptedException | ExecutionException | IOException e) {
-            throw new RuntimeException(e);
-        }
+        });
     }
 
     private static class StreamBoozer implements Callable<List<String>> {
@@ -94,31 +104,25 @@ class ProcessWrapper {
         }
     }
 
+    @Value
+    @Builder(builderClassName = "Builder")
     public static class ProcessResult {
-        private List<String> stderrLines;
-        private List<String> stdoutLines;
+        private List<String> errors;
+        private List<String> output;
         private int status;
-
-        public ProcessResult(int status, List<String> stdoutLines, List<String> stderrLines) {
-            this.status = status;
-            this.stderrLines = requireNonNull(stderrLines);
-            this.stdoutLines = requireNonNull(stdoutLines);
-        }
-
-        public int getStatus() {
-            return status;
-        }
-
-        public List<String> getErrors() {
-            return ImmutableList.copyOf(stderrLines);
-        }
 
         public boolean hasErrors() {
             return !getErrors().isEmpty();
         }
 
-        public List<String> getInfos() {
-            return ImmutableList.copyOf(stdoutLines);
+        public List<String> getCleanedOutput() {
+            Predicate<String> isNewLine = line -> "\n".equals(line) || System.lineSeparator().equals(line);
+            Predicate<String> isEmptyLine = StringUtils::isBlank;
+
+            return getOutput().stream()
+                    .filter(isEmptyLine.negate())
+                    .filter(isNewLine.negate())
+                    .collect(toList());
         }
 
     }
