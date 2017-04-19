@@ -9,7 +9,7 @@ import static org.junit.Assert.assertThat;
 public class CryptotoolOptionsImplTest {
 
     @Test
-    public void itSouldHaveAnElegantConstructionMechanism() throws Exception {
+    public void itSouldHaveAnElegantConstructionMechanism() {
         CryptotoolOptions cryptotoolOptions = CryptotoolOptionsImpl.createDefault();
 
         assertThat(cryptotoolOptions, is(notNullValue()));

@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 public class CryptotoolUtilsTest {
 
     @Test
-    public void decodingAndEncodingFromAndToHexShouldBeTheSame() throws Exception {
+    public void decodingAndEncodingFromAndToHexShouldBeTheSame() {
         String value = RandomStringUtils.randomAlphanumeric(1000);
 
         String valueBase64 = Base64.getEncoder().encodeToString(value.getBytes(Charsets.UTF_8));
@@ -28,7 +28,7 @@ public class CryptotoolUtilsTest {
     }
 
     @Test
-    public void decodeBase64AsHex() throws Exception {
+    public void decodeBase64AsHex() {
         String value = "ABCDEF";
 
         String valueBase64 = Base64.getEncoder().encodeToString(value.getBytes(Charsets.UTF_8));
@@ -39,7 +39,7 @@ public class CryptotoolUtilsTest {
     }
 
     @Test
-    public void encodeHexAsBase64() throws Exception {
+    public void encodeHexAsBase64() {
         String value = "ABCDEF";
 
         String valueHex = new String(Hex.encodeHex(value.getBytes(Charsets.UTF_8)));

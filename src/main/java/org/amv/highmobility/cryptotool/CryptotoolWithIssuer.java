@@ -4,8 +4,6 @@ import lombok.Builder;
 import lombok.Value;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
-
 public interface CryptotoolWithIssuer extends Cryptotool {
     interface CertificateIssuer {
         String getName();
@@ -29,15 +27,15 @@ public interface CryptotoolWithIssuer extends Cryptotool {
 
     CertificateIssuer getCertificateIssuer();
 
-    default Mono<Signature> generateSignature(String message) throws IOException {
+    default Mono<Signature> generateSignature(String message) {
         return generateSignature(message, getCertificateIssuer().getKeys().getPrivateKey());
     }
 
-    default Mono<Validity> verifySignature(String message, String signature) throws IOException {
+    default Mono<Validity> verifySignature(String message, String signature) {
         return verifySignature(message, signature, getCertificateIssuer().getKeys().getPublicKey());
     }
 
-    default Mono<DeviceCertificate> createDeviceCertificate(String appId, String serial) throws IOException {
-        return createDeviceCertificate( getCertificateIssuer().getName(), appId, serial, getCertificateIssuer().getKeys().getPublicKey());
+    default Mono<DeviceCertificate> createDeviceCertificate(String appId, String serial) {
+        return createDeviceCertificate(getCertificateIssuer().getName(), appId, serial, getCertificateIssuer().getKeys().getPublicKey());
     }
 }

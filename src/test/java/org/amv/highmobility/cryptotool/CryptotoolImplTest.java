@@ -9,8 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.event.Level;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -25,21 +23,21 @@ public class CryptotoolImplTest {
     private Cryptotool sut;
 
     @Before
-    public void setUp() throws URISyntaxException, IOException {
+    public void setUp() {
         CryptotoolOptions cryptotoolOptions = CryptotoolOptionsImpl.createDefault();
 
         this.sut = new CryptotoolImpl(cryptotoolOptions);
     }
 
     @Test
-    public void itSouldHaveAnElegantConstructionMechanism() throws Exception {
+    public void itSouldHaveAnElegantConstructionMechanism() {
         Cryptotool cryptotool = new CryptotoolImpl(CryptotoolOptionsImpl.createDefault());
 
         assertThat(cryptotool, Matchers.is(Matchers.notNullValue()));
     }
 
     @Test
-    public void itShouldShowVersion() throws IOException {
+    public void itShouldShowVersion() {
         Cryptotool.Version version = this.sut.version()
                 .block();
 
@@ -51,7 +49,7 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    public void itShouldGenerateKeys() throws IOException {
+    public void itShouldGenerateKeys() {
         Cryptotool.Keys keys = this.sut.generateKeys()
                 .block();
 
@@ -61,7 +59,7 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    public void itShouldGenerateSignatures() throws IOException {
+    public void itShouldGenerateSignatures() {
         Cryptotool.Keys keys = this.sut.generateKeys()
                 .block();
 
@@ -74,7 +72,7 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    public void itShouldVerifySignature() throws IOException {
+    public void itShouldVerifySignature() {
         Cryptotool.Keys keys = this.sut.generateKeys()
                 .block();
 
@@ -91,7 +89,7 @@ public class CryptotoolImplTest {
 
 
     @Test(expected = IllegalStateException.class)
-    public void itShouldVerifySignatureFailureWithOverlongMessage() throws IOException {
+    public void itShouldVerifySignatureFailureWithOverlongMessage() {
         Cryptotool.Keys keys = this.sut.generateKeys()
                 .block();
 
@@ -103,7 +101,7 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    public void itShouldFailVerifyingSignaturesWithMismatchingMessage() throws IOException {
+    public void itShouldFailVerifyingSignaturesWithMismatchingMessage() {
         Cryptotool.Keys keys = this.sut.generateKeys()
                 .block();
 
@@ -120,7 +118,7 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    public void itShouldFailVerifyingSignaturesWithDifferentKey() throws IOException {
+    public void itShouldFailVerifyingSignaturesWithDifferentKey() {
         Cryptotool.Keys keys = this.sut.generateKeys()
                 .block();
 
@@ -139,7 +137,7 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    public void itShouldGenerateHmac() throws IOException {
+    public void itShouldGenerateHmac() {
         String key = RandomStringUtils.randomNumeric(64);
         String anyMessage = RandomStringUtils.randomAlphabetic(RandomUtils.nextInt(1, 500));
         Cryptotool.Hmac hmac = this.sut.generateHmac(anyMessage, key)
@@ -150,7 +148,7 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    public void itShouldVerifyHmac() throws IOException {
+    public void itShouldVerifyHmac() {
         String key = RandomStringUtils.randomNumeric(64);
         String anyMessage = RandomStringUtils.randomAlphabetic(RandomUtils.nextInt(1, 500));
 
@@ -164,7 +162,7 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    public void itShouldFailVerifyingHmacWithMismatchingMessage() throws IOException {
+    public void itShouldFailVerifyingHmacWithMismatchingMessage() {
         String key = RandomStringUtils.randomNumeric(64);
         String anyMessage = RandomStringUtils.randomAlphabetic(RandomUtils.nextInt(1, 10));
 
@@ -180,7 +178,7 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    public void itShouldFailVerifyingHmacWithDifferentKey() throws IOException {
+    public void itShouldFailVerifyingHmacWithDifferentKey() {
         String key = RandomStringUtils.randomNumeric(64);
         String anyMessage = RandomStringUtils.randomAlphabetic(RandomUtils.nextInt(1, 10));
 
@@ -196,7 +194,7 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    public void itShouldCreateDeviceCertificate() throws IOException {
+    public void itShouldCreateDeviceCertificate() {
         Cryptotool.Keys keys = this.sut.generateKeys()
                 .block();
 
@@ -212,7 +210,7 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    public void itShouldCreateAccessCertificate() throws IOException {
+    public void itShouldCreateAccessCertificate() {
         Cryptotool.Keys keys = this.sut.generateKeys()
                 .block();
 

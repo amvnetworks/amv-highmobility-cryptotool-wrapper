@@ -1,15 +1,11 @@
 package org.amv.highmobility.cryptotool;
 
-import com.google.common.io.Files;
 import org.amv.highmobility.cryptotool.CryptotoolUtils.TestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.event.Level;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -23,11 +19,8 @@ public class CryptotoolWithIssuerImplTest {
     private CryptotoolWithIssuer sut;
 
     @Before
-    public void setUp() throws URISyntaxException, IOException {
-        CryptotoolOptions cryptotoolOptions = CryptotoolOptionsImpl.builder()
-                .pathToExecutable(BinaryHelper.getCryptotoolBinary())
-                .workingDirectory(Files.createTempDir())
-                .build();
+    public void setUp() {
+        CryptotoolOptions cryptotoolOptions = CryptotoolOptionsImpl.createDefault();
 
         Cryptotool cryptotool = new CryptotoolImpl(cryptotoolOptions);
 
@@ -40,7 +33,7 @@ public class CryptotoolWithIssuerImplTest {
     }
 
     @Test
-    public void itShouldCreateAndVerifySignaturesWithSuccess() throws IOException {
+    public void itShouldCreateAndVerifySignaturesWithSuccess() {
         String anyMessage = RandomStringUtils.randomAlphabetic(RandomUtils.nextInt(1, 500));
 
         Cryptotool.Signature signature = this.sut.generateSignature(anyMessage)
@@ -53,7 +46,7 @@ public class CryptotoolWithIssuerImplTest {
     }
 
     @Test
-    public void itShouldCreateDeviceCertificate() throws IOException {
+    public void itShouldCreateDeviceCertificate() {
         String appId = TestUtils.generateRandomAppId();
         String serial = TestUtils.generateRandomSerial();
 
