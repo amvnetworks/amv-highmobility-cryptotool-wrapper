@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -270,20 +269,21 @@ public class CryptotoolImpl implements Cryptotool {
                 commands,
                 Collections.emptyMap());
 
-        ProcessWrapper.ProcessResult processResult = processWrapper.execute();
+        return processWrapper.execute()
+                .doOnNext(processResult -> {
+                    if (processResult.hasErrors() && log.isWarnEnabled()) {
+                        log.warn("Found output on stderr: \n{}", processResult.getErrors());
+                    }
+                })
+                .map(processResult -> {
+                    Predicate<String> isNewLine = line -> "\n".equals(line) || System.lineSeparator().equals(line);
+                    Predicate<String> isEmptyLine = StringUtils::isBlank;
 
-        if (processResult.hasErrors()) {
-            log.error("Found output on stderr: \n{}", processResult.getErrors());
-        }
-
-        Predicate<String> isNewLine = line -> "\n".equals(line) || System.lineSeparator().equals(line);
-        Predicate<String> isEmptyLine = StringUtils::isBlank;
-
-        Stream<String> stdInputStream = processResult.getInfos().stream()
-                .filter(isEmptyLine.negate())
-                .filter(isNewLine.negate());
-
-        return Mono.fromCallable(() -> transformer.apply(stdInputStream));
+                    return processResult.getInfos().stream()
+                            .filter(isEmptyLine.negate())
+                            .filter(isNewLine.negate());
+                })
+                .map(transformer::apply);
     }
 
     @Value

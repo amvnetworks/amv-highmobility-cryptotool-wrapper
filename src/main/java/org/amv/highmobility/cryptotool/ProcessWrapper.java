@@ -3,6 +3,7 @@ package org.amv.highmobility.cryptotool;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 
 import java.io.*;
 import java.util.Collections;
@@ -34,7 +35,7 @@ class ProcessWrapper {
         this.environment = ImmutableMap.copyOf(requireNonNull(environment));
     }
 
-    public ProcessResult execute() {
+    public Mono<ProcessResult> execute() {
         ProcessBuilder pb = new ProcessBuilder(commands);
 
         if (directory != null) {
@@ -44,22 +45,23 @@ class ProcessWrapper {
             pb.environment().putAll(environment);
         }
 
-        ExecutorService executor = Executors.newFixedThreadPool(2);
-
-        try {
-
+        return Mono.fromCallable(() -> {
             if (log.isDebugEnabled()) {
-                log.debug("Executing: {}", commands.stream().collect(joining(" ")));
+                log.debug("Executed: {}", commands.stream().collect(joining(" ")));
             }
+            return pb.start();
+        }).map(this::readProcessOutput);
+    }
 
-            Process process = pb.start();
+    private ProcessResult readProcessOutput(Process process) {
+        try {
+            ExecutorService executor = Executors.newFixedThreadPool(2);
 
+            int status = process.waitFor();
             try (InputStream stdoutStream = process.getInputStream();
                  InputStream stderrStream = process.getErrorStream()) {
                 Future<List<String>> stdout = executor.submit(new StreamBoozer(stdoutStream));
                 Future<List<String>> stderr = executor.submit(new StreamBoozer(stderrStream));
-
-                int status = process.waitFor();
 
                 ProcessResult processResult = new ProcessResult(status, stdout.get(), stderr.get());
 
@@ -77,7 +79,6 @@ class ProcessWrapper {
             throw new RuntimeException(e);
         }
     }
-
 
     private static class StreamBoozer implements Callable<List<String>> {
         private InputStream in;
