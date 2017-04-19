@@ -96,12 +96,12 @@ if (project.hasProperty('release')) {
         key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
         configurations = ['archives']
         pkg {
-            repo = 'amv-trafficsoft-rest'
+            repo = 'amv-highmobility-cryptotool-wrapper'
             name = project.name
             userOrg = user
             licenses = ['MIT']
             vcsUrl = 'https://github.com/amvnetworks/amv-highmobility-cryptotool-wrapper.git'
-            labels = ['amv', 'trafficsoft']
+            labels = ['amv', 'highmobility', 'cryptotool']
             publicDownloadNumbers = false
             version {
                 name = rootProject.version
