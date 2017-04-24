@@ -4,6 +4,7 @@ package org.amv.highmobility.cryptotool;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.RandomUtils;
 
 import java.util.Base64;
 
@@ -43,16 +44,20 @@ public final class CryptotoolUtils {
             throw new UnsupportedOperationException();
         }
 
+        public static String generateRandomHexString(int byteCount) {
+            return Hex.encodeHexString(RandomUtils.nextBytes(byteCount));
+        }
+
         public static String generateRandomSerial() {
-            return RandomStringUtils.randomNumeric(18);
+            return generateRandomHexString(9);
         }
 
         public static String generateRandomAppId() {
-            return RandomStringUtils.randomAlphabetic(24).toUpperCase();
+            return generateRandomHexString(12);
         }
 
         public static String generateRandomIssuer() {
-            return RandomStringUtils.randomAlphabetic(8).toUpperCase();
+            return generateRandomHexString(4);
         }
     }
 

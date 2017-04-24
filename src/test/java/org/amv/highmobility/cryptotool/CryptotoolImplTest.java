@@ -1,8 +1,6 @@
 package org.amv.highmobility.cryptotool;
 
 import org.amv.highmobility.cryptotool.CryptotoolUtils.TestUtils;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -63,7 +61,7 @@ public class CryptotoolImplTest {
         Cryptotool.Keys keys = this.sut.generateKeys()
                 .block();
 
-        String anyMessage = RandomStringUtils.randomAlphabetic(RandomUtils.nextInt(1, 500));
+        String anyMessage = TestUtils.generateRandomHexString(256);
         Cryptotool.Signature signature = this.sut.generateSignature(anyMessage, keys.getPrivateKey())
                 .block();
 
@@ -76,7 +74,7 @@ public class CryptotoolImplTest {
         Cryptotool.Keys keys = this.sut.generateKeys()
                 .block();
 
-        String anyMessage = RandomStringUtils.randomAlphabetic(RandomUtils.nextInt(1, 500));
+        String anyMessage = TestUtils.generateRandomHexString(256);
         Cryptotool.Signature signature = this.sut.generateSignature(anyMessage, keys.getPrivateKey())
                 .block();
 
@@ -93,11 +91,11 @@ public class CryptotoolImplTest {
         Cryptotool.Keys keys = this.sut.generateKeys()
                 .block();
 
-        String anyMessage = RandomStringUtils.randomAlphabetic(1_000);
+        String anyMessage = TestUtils.generateRandomHexString(512);
         Cryptotool.Signature signature = this.sut.generateSignature(anyMessage, keys.getPrivateKey())
                 .block();
 
-        Assert.fail("Should have thrown exception");
+        Assert.fail("Should have thrown exception when generting signature for overlong message.");
     }
 
     @Test
@@ -105,11 +103,11 @@ public class CryptotoolImplTest {
         Cryptotool.Keys keys = this.sut.generateKeys()
                 .block();
 
-        String anyMessage = RandomStringUtils.randomAlphabetic(RandomUtils.nextInt(1, 500));
+        String anyMessage = TestUtils.generateRandomHexString(128);
         Cryptotool.Signature signature = this.sut.generateSignature(anyMessage, keys.getPrivateKey())
                 .block();
 
-        String mismatchingMessage = anyMessage + RandomStringUtils.randomAlphabetic(10);
+        String mismatchingMessage = anyMessage + TestUtils.generateRandomHexString(128);
         Cryptotool.Validity validity = this.sut.verifySignature(mismatchingMessage, signature.getSignature(), keys.getPublicKey())
                 .block();
 
@@ -118,11 +116,11 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    public void itShouldFailVerifyingSignaturesWithDifferentKey() {
+    public void itShouldFailVerifyingSignaturesWithMismatchingKey() {
         Cryptotool.Keys keys = this.sut.generateKeys()
                 .block();
 
-        String anyMessage = RandomStringUtils.randomAlphabetic(RandomUtils.nextInt(1, 500));
+        String anyMessage = TestUtils.generateRandomHexString(256);
         Cryptotool.Signature signature = this.sut.generateSignature(anyMessage, keys.getPrivateKey())
                 .block();
 
@@ -138,8 +136,8 @@ public class CryptotoolImplTest {
 
     @Test
     public void itShouldGenerateHmac() {
-        String key = RandomStringUtils.randomNumeric(64);
-        String anyMessage = RandomStringUtils.randomAlphabetic(RandomUtils.nextInt(1, 500));
+        String key = TestUtils.generateRandomHexString(32);
+        String anyMessage = TestUtils.generateRandomHexString(256);
         Cryptotool.Hmac hmac = this.sut.generateHmac(anyMessage, key)
                 .block();
 
@@ -149,8 +147,8 @@ public class CryptotoolImplTest {
 
     @Test
     public void itShouldVerifyHmac() {
-        String key = RandomStringUtils.randomNumeric(64);
-        String anyMessage = RandomStringUtils.randomAlphabetic(RandomUtils.nextInt(1, 500));
+        String key = TestUtils.generateRandomHexString(32);
+        String anyMessage = TestUtils.generateRandomHexString(256);
 
         Cryptotool.Hmac hmac = this.sut.generateHmac(anyMessage, key)
                 .block();
@@ -163,13 +161,13 @@ public class CryptotoolImplTest {
 
     @Test
     public void itShouldFailVerifyingHmacWithMismatchingMessage() {
-        String key = RandomStringUtils.randomNumeric(64);
-        String anyMessage = RandomStringUtils.randomAlphabetic(RandomUtils.nextInt(1, 10));
+        String key = TestUtils.generateRandomHexString(32);
+        String anyMessage = TestUtils.generateRandomHexString(128);
 
         Cryptotool.Hmac hmac = this.sut.generateHmac(anyMessage, key)
                 .block();
 
-        String mismatchingMessage = anyMessage + RandomStringUtils.randomAlphabetic(10);
+        String mismatchingMessage = anyMessage + TestUtils.generateRandomHexString(128);
         Cryptotool.Validity validity = this.sut.verifyHmac(mismatchingMessage, key, hmac.getHmac())
                 .block();
 
@@ -178,14 +176,14 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    public void itShouldFailVerifyingHmacWithDifferentKey() {
-        String key = RandomStringUtils.randomNumeric(64);
-        String anyMessage = RandomStringUtils.randomAlphabetic(RandomUtils.nextInt(1, 10));
+    public void itShouldFailVerifyingHmacWithMismatchingKey() {
+        String key = TestUtils.generateRandomHexString(32);
+        String anyMessage = TestUtils.generateRandomHexString(256);
 
         Cryptotool.Hmac hmac = this.sut.generateHmac(anyMessage, key)
                 .block();
 
-        String mismatchingKey = key.substring(0, 32) + RandomStringUtils.randomAlphabetic(32);
+        String mismatchingKey = key.substring(0, 32) + TestUtils.generateRandomHexString(16);
         Cryptotool.Validity validity = this.sut.verifyHmac(anyMessage, mismatchingKey, hmac.getHmac())
                 .block();
 

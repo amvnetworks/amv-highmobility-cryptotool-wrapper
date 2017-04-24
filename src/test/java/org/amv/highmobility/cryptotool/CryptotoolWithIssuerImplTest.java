@@ -1,8 +1,6 @@
 package org.amv.highmobility.cryptotool;
 
 import org.amv.highmobility.cryptotool.CryptotoolUtils.TestUtils;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.event.Level;
@@ -34,7 +32,7 @@ public class CryptotoolWithIssuerImplTest {
 
     @Test
     public void itShouldCreateAndVerifySignaturesWithSuccess() {
-        String anyMessage = RandomStringUtils.randomAlphabetic(RandomUtils.nextInt(1, 500));
+        String anyMessage = TestUtils.generateRandomHexString(256);
 
         Cryptotool.Signature signature = this.sut.generateSignature(anyMessage)
                 .block();
