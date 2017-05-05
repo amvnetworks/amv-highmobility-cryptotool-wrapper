@@ -1,5 +1,6 @@
 package org.amv.highmobility.cryptotool;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import lombok.Builder;
@@ -99,7 +100,7 @@ class ProcessWrapper {
 
         @Override
         public List<String> call() {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(this.in));
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(this.in, Charsets.UTF_8));
             return bufferedReader.lines().collect(toList());
         }
     }
