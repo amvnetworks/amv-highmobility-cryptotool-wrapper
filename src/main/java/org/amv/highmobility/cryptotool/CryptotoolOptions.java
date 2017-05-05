@@ -11,8 +11,8 @@ public interface CryptotoolOptions {
     File getWorkingDirectory();
 
     default CryptotoolOptions validOrThrow() throws IllegalArgumentException {
-        requireNonNull(this.getPathToExecutable());
-        requireNonNull(this.getWorkingDirectory());
+        requireNonNull(this.getPathToExecutable(), "`pathToExecutable` must not be null");
+        requireNonNull(this.getWorkingDirectory(), "`workingDirectory` must not be null");
         checkArgument(this.getPathToExecutable().exists(), "`pathToExecutable` does not exist");
         checkArgument(this.getWorkingDirectory().exists(), "`workingDirectory` does not exist");
 

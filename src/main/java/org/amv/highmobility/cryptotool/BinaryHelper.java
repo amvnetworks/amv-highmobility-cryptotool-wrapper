@@ -27,7 +27,9 @@ public final class BinaryHelper {
         File tempDir = Files.createTempDir();
         tempDir.deleteOnExit();
 
-        File file = JarUtil.extractFileFromJarToDisk(getPathToBinaryInJar(), tempDir.getAbsolutePath(), TARGET_BINARY_NAME);
+        File file = JarUtil.extractFileFromJarToDisk(getPathToBinaryInJar(),
+                tempDir.getAbsolutePath(),
+                TARGET_BINARY_NAME);
         File executableFile = makeFileExecutableOrThrow(file);
 
         if (log.isDebugEnabled()) {

@@ -36,6 +36,7 @@ public interface CryptotoolWithIssuer extends Cryptotool {
     }
 
     default Mono<DeviceCertificate> createDeviceCertificate(String appId, String serial) {
-        return createDeviceCertificate(getCertificateIssuer().getName(), appId, serial, getCertificateIssuer().getKeys().getPublicKey());
+        return createDeviceCertificate(getCertificateIssuer().getName(), appId, serial,
+                getCertificateIssuer().getKeys().getPublicKey());
     }
 }

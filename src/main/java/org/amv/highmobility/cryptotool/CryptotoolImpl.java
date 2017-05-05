@@ -52,10 +52,10 @@ public class CryptotoolImpl implements Cryptotool {
                     List<String> stdOutput = process.getCleanedOutput();
 
                     String privateKey = parseValueWithPrefix(privateKeyPrefix, stdOutput)
-                            .orElseThrow(() -> new IllegalStateException("Cannot find generated private key on stdout"));
+                            .orElseThrow(() -> new IllegalStateException("Cannot find private key on stdout"));
 
                     String publicKey = parseValueWithPrefix(publicKeyPrefix, stdOutput)
-                            .orElseThrow(() -> new IllegalStateException("Cannot find generated public key on stdout"));
+                            .orElseThrow(() -> new IllegalStateException("Cannot find public key on stdout"));
 
                     return KeysImpl.builder()
                             .privateKey(privateKey)
@@ -151,13 +151,18 @@ public class CryptotoolImpl implements Cryptotool {
     }
 
     @Override
-    public Mono<AccessCertificate> createAccessCertificate(String gainingSerial, String publicKey, String providingSerial, LocalDateTime startDate, LocalDateTime endDate, Collection<String> permissions) {
+    public Mono<AccessCertificate> createAccessCertificate(String gainingSerial,
+                                                           String publicKey,
+                                                           String providingSerial,
+                                                           LocalDateTime startDate,
+                                                           LocalDateTime endDate,
+                                                           Collection<String> permissions) {
         checkArgument(!isNullOrEmpty(gainingSerial), "`gainingSerial` must not be empty");
         checkArgument(!isNullOrEmpty(publicKey), "`publicKey` must not be empty");
         checkArgument(!isNullOrEmpty(providingSerial), "`providingSerial` must not be empty");
         requireNonNull(startDate, "`startDate` must not be null");
         requireNonNull(endDate, "`endDate` must not be null");
-        checkArgument(startDate.isBefore(endDate), "`startDate` must not be after endDate");
+        checkArgument(startDate.isBefore(endDate), "`startDate` must not be after `endDate`");
 
         String startDateAsString = startDate.format(DateTimeFormatter.ofPattern("YYMMddHHmm"));
         String endDateAsString = endDate.format(DateTimeFormatter.ofPattern("YYMMddHHmm"));
@@ -182,7 +187,10 @@ public class CryptotoolImpl implements Cryptotool {
     }
 
     @Override
-    public Mono<DeviceCertificate> createDeviceCertificate(String issuer, String appId, String serial, String publicKey) {
+    public Mono<DeviceCertificate> createDeviceCertificate(String issuer,
+                                                           String appId,
+                                                           String serial,
+                                                           String publicKey) {
         checkArgument(!isNullOrEmpty(issuer), "`issuer` must not be empty");
         checkArgument(!isNullOrEmpty(appId), "`appId` must not be empty");
         checkArgument(!isNullOrEmpty(serial), "`serial` must not be empty");

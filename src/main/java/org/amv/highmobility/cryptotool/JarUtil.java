@@ -16,7 +16,9 @@ final class JarUtil {
         throw new UnsupportedOperationException();
     }
 
-    static File extractFileFromJarToDisk(String pathToFileInsideJar, String pathToTargetDirectory, String targetFileName) throws IOException {
+    static File extractFileFromJarToDisk(String pathToFileInsideJar,
+                                         String pathToTargetDirectory,
+                                         String targetFileName) throws IOException {
         requireNonNull(pathToFileInsideJar, "`pathToFileInsideJar` must not be null");
         checkArgument(!Strings.isNullOrEmpty(pathToFileInsideJar));
 

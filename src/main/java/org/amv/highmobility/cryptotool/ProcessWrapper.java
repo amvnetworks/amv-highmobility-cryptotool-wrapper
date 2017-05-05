@@ -21,8 +21,8 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 /**
- * A wrapper for the {@link ProcessBuilder} that reads all relevant streams which can cause an 'hanging' {@link Process}. The
- * read data of the streams is provided as strings.
+ * A wrapper for the {@link ProcessBuilder} that reads all relevant streams which can cause a 'hanging'
+ * {@link Process}. The read data of the streams is provided as strings.
  */
 @Slf4j
 class ProcessWrapper {
