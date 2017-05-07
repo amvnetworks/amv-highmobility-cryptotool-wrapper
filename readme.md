@@ -4,6 +4,7 @@
 
 amv-highmobility-cryptotool-wrapper
 ========
+amv-highmobility-cryptotool-wrapper requires Java version 1.8.0_92 or greater.
 
 # build
 ```bash
