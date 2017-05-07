@@ -16,6 +16,7 @@ public final class BinaryHelper {
 
     private static final String PATH_TO_BINARY_IN_JAR_WINDOWS = "/cryptotool/bin/crypto-tool.exe";
     private static final String PATH_TO_BINARY_IN_JAR_UNIX = "/cryptotool/bin/crypto-tool";
+    private static final String PATH_TO_BINARY_IN_JAR_UNIX_REDHAT = "/cryptotool/bin/crypto-tool-fedora";
 
     private static final String TARGET_BINARY_NAME = "crypto-tool";
 
@@ -52,10 +53,30 @@ public final class BinaryHelper {
         boolean isOsSupported = SystemUtils.IS_OS_WINDOWS || SystemUtils.IS_OS_UNIX;
         checkArgument(isOsSupported, "Unsupported operating system");
 
-        if (SystemUtils.IS_OS_WINDOWS) {
+        if (SystemHelper.isWindows()) {
             return PATH_TO_BINARY_IN_JAR_WINDOWS;
-        } else {
-            return PATH_TO_BINARY_IN_JAR_UNIX;
+        } else if (SystemHelper.isLinux()) {
+            return SystemHelper.isRedhat() ?
+                    PATH_TO_BINARY_IN_JAR_UNIX_REDHAT :
+                    PATH_TO_BINARY_IN_JAR_UNIX;
+        }
+
+        throw new IllegalStateException("Non compatible operating system for " + TARGET_BINARY_NAME);
+    }
+
+
+    private static final class SystemHelper {
+
+        private static boolean isWindows() {
+            return SystemUtils.IS_OS_WINDOWS;
+        }
+
+        private static boolean isLinux() {
+            return SystemUtils.IS_OS_LINUX;
+        }
+
+        private static boolean isRedhat() {
+            return isLinux() && new File("/etc/redhat-release").exists();
         }
     }
 }
