@@ -83,7 +83,7 @@ checkstyle {
 
 findbugs {
     effort = 'min'
-    ignoreFailures = true
+    ignoreFailures = false
     sourceSets = [sourceSets.main]
 }
 
