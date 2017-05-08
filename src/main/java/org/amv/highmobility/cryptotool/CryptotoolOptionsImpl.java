@@ -1,11 +1,12 @@
 package org.amv.highmobility.cryptotool;
 
 import lombok.Builder;
+import lombok.Getter;
 import lombok.Value;
 
 import static java.util.Objects.requireNonNull;
 
-@Value
+@Getter
 @Builder(builderClassName = "Builder")
 public class CryptotoolOptionsImpl implements CryptotoolOptions {
 

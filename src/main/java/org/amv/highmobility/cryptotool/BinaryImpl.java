@@ -1,6 +1,7 @@
 package org.amv.highmobility.cryptotool;
 
 import lombok.Builder;
+import lombok.Getter;
 import lombok.Value;
 
 import java.io.File;
@@ -8,7 +9,7 @@ import java.io.File;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
-@Value
+@Getter
 @Builder(builderClassName = "Builder")
 public class BinaryImpl implements Binary {
     private final File file;

@@ -246,6 +246,8 @@ public class CryptotoolImplTest {
                 .block();
         assertThat(accessCertificate, is(notNullValue()));
         assertThat(accessCertificate.getAccessCertificate(), is(notNullValue()));
+        assertThat(accessCertificate.getValidityStartDate(), is(startDate));
+        assertThat(accessCertificate.getValidityEndDate(), is(endDate));
     }
 
 }

@@ -22,7 +22,6 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
-@Value
 @Builder(builderClassName = "Builder")
 public class BinaryExecutorImpl implements BinaryExecutor {
 

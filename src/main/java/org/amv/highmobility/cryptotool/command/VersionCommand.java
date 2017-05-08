@@ -7,7 +7,6 @@ import org.amv.highmobility.cryptotool.Cryptotool.Version;
 import org.amv.highmobility.cryptotool.CryptotoolImpl;
 import reactor.core.publisher.Flux;
 
-@Value
 @Builder(builderClassName = "Builder")
 public class VersionCommand implements Command<Version> {
 

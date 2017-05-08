@@ -2,6 +2,7 @@ package org.amv.highmobility.cryptotool.command;
 
 import com.google.common.collect.ImmutableList;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.Value;
 import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool;
@@ -14,7 +15,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 
-@Value
 @Builder(builderClassName = "Builder")
 public class DeviceCommand implements Command<Cryptotool.DeviceCertificate> {
 

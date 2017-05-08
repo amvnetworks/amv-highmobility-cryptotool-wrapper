@@ -1,7 +1,7 @@
 package org.amv.highmobility.cryptotool;
 
 import lombok.Builder;
-import lombok.Value;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.amv.highmobility.cryptotool.command.*;
 import reactor.core.publisher.Mono;
@@ -120,7 +120,7 @@ public class CryptotoolImpl implements Cryptotool {
                 .single();
     }
 
-    @Value
+    @Getter
     @Builder(builderClassName = "Builder")
     public static class VersionImpl implements Version {
         private String major;
@@ -128,14 +128,14 @@ public class CryptotoolImpl implements Cryptotool {
         private String patch;
     }
 
-    @Value
+    @Getter
     @Builder(builderClassName = "Builder")
     public static class KeysImpl implements Keys {
         private String privateKey;
         private String publicKey;
     }
 
-    @Value
+    @Getter
     @Builder(builderClassName = "Builder")
     public static class AccessCertificateImpl implements AccessCertificate {
         private String accessCertificate;
@@ -143,19 +143,19 @@ public class CryptotoolImpl implements Cryptotool {
         private LocalDateTime validityEndDate;
     }
 
-    @Value
+    @Getter
     @Builder(builderClassName = "Builder")
     public static class DeviceCertificateImpl implements DeviceCertificate {
         private String deviceCertificate;
     }
 
-    @Value
+    @Getter
     @Builder(builderClassName = "Builder")
     public static class SignatureImpl implements Signature {
         private String signature;
     }
 
-    @Value
+    @Getter
     @Builder(builderClassName = "Builder")
     public static class HmacImpl implements Hmac {
         private String hmac;

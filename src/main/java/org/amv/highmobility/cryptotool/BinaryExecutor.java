@@ -1,7 +1,7 @@
 package org.amv.highmobility.cryptotool;
 
 import lombok.Builder;
-import lombok.Value;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Flux;
 
@@ -19,7 +19,7 @@ public interface BinaryExecutor {
 
     Flux<ProcessResult> execute(List<String> args);
 
-    @Value
+    @Getter
     @Builder(builderClassName = "Builder")
     class ProcessResult {
         private List<String> errors;

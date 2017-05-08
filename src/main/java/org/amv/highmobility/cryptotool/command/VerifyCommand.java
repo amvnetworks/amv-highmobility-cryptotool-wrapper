@@ -13,7 +13,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 
-@Value
 @Builder(builderClassName = "Builder")
 public class VerifyCommand implements Command<Cryptotool.Validity> {
 

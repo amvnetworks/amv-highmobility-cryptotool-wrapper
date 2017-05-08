@@ -11,7 +11,6 @@ import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 
-@Value
 @Builder(builderClassName = "Builder")
 public class KeysCommand implements Command<Cryptotool.Keys> {
 

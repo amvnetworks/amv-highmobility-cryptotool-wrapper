@@ -14,7 +14,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 
-@Value
 @Builder(builderClassName = "Builder")
 public class SignCommand implements Command<Cryptotool.Signature> {
 

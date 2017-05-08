@@ -1,7 +1,7 @@
 package org.amv.highmobility.cryptotool;
 
 import lombok.Builder;
-import lombok.Value;
+import lombok.Getter;
 import reactor.core.publisher.Mono;
 
 public interface CryptotoolWithIssuer extends Cryptotool {
@@ -13,7 +13,7 @@ public interface CryptotoolWithIssuer extends Cryptotool {
         String getPublicKeyBase64();
     }
 
-    @Value
+    @Getter
     @Builder
     class CertificateIssuerImpl implements CertificateIssuer {
         private String name;
