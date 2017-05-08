@@ -2,6 +2,7 @@ package org.amv.highmobility.cryptotool.command;
 
 
 import com.google.common.collect.ImmutableList;
+import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool;
 import org.amv.highmobility.cryptotool.CryptotoolImpl;
 import reactor.core.publisher.Flux;
@@ -14,11 +15,11 @@ import static java.util.Objects.requireNonNull;
 
 public class SignCommand implements Command<Cryptotool.Signature> {
 
-    private final CommandExecutor executor;
+    private final BinaryExecutor executor;
     private final String message;
     private final String privateKey;
 
-    public SignCommand(CommandExecutor executor, String message, String privateKey) {
+    public SignCommand(BinaryExecutor executor, String message, String privateKey) {
         checkArgument(!isNullOrEmpty(privateKey), "`privateKey` must not be empty");
 
         this.executor = requireNonNull(executor);

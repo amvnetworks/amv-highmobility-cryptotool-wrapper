@@ -2,6 +2,7 @@ package org.amv.highmobility.cryptotool.command;
 
 
 import com.google.common.collect.ImmutableList;
+import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool;
 import org.amv.highmobility.cryptotool.CryptotoolImpl;
 import reactor.core.publisher.Flux;
@@ -14,13 +15,13 @@ import static java.util.Objects.requireNonNull;
 
 public class DeviceCommand implements Command<Cryptotool.DeviceCertificate> {
 
-    private final CommandExecutor executor;
+    private final BinaryExecutor executor;
     private final String issuer;
     private final String appId;
     private final String serial;
     private final String publicKey;
 
-    public DeviceCommand(CommandExecutor executor, String issuer, String appId, String serial, String publicKey) {
+    public DeviceCommand(BinaryExecutor executor, String issuer, String appId, String serial, String publicKey) {
         checkArgument(!isNullOrEmpty(issuer), "`issuer` must not be empty");
         checkArgument(!isNullOrEmpty(appId), "`appId` must not be empty");
         checkArgument(!isNullOrEmpty(serial), "`serial` must not be empty");

@@ -1,6 +1,7 @@
 package org.amv.highmobility.cryptotool.command;
 
 
+import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool.Version;
 import org.amv.highmobility.cryptotool.CryptotoolImpl;
 import reactor.core.publisher.Flux;
@@ -9,9 +10,9 @@ import static java.util.Objects.requireNonNull;
 
 public class VersionCommand implements Command<Version> {
 
-    private final CommandExecutor executor;
+    private final BinaryExecutor executor;
 
-    public VersionCommand(CommandExecutor executor) {
+    public VersionCommand(BinaryExecutor executor) {
         this.executor = requireNonNull(executor);
     }
 

@@ -2,6 +2,7 @@ package org.amv.highmobility.cryptotool.command;
 
 
 import com.google.common.collect.ImmutableList;
+import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool;
 import reactor.core.publisher.Flux;
 
@@ -13,12 +14,12 @@ import static java.util.Objects.requireNonNull;
 
 public class VerifyCommand implements Command<Cryptotool.Validity> {
 
-    private final CommandExecutor executor;
+    private final BinaryExecutor executor;
     private final String message;
     private final String signature;
     private final String publicKey;
 
-    public VerifyCommand(CommandExecutor executor, String message, String signature, String publicKey) {
+    public VerifyCommand(BinaryExecutor executor, String message, String signature, String publicKey) {
         checkArgument(!isNullOrEmpty(signature), "`signature` must not be empty");
         checkArgument(!isNullOrEmpty(publicKey), "`publicKey` must not be empty");
 

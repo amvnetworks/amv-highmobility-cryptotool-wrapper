@@ -2,6 +2,7 @@ package org.amv.highmobility.cryptotool.command;
 
 
 import com.google.common.collect.ImmutableList;
+import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool;
 import org.amv.highmobility.cryptotool.CryptotoolImpl;
 import reactor.core.publisher.Flux;
@@ -14,11 +15,11 @@ import static java.util.Objects.requireNonNull;
 
 public class HmacCommand implements Command<Cryptotool.Hmac> {
 
-    private final CommandExecutor executor;
+    private final BinaryExecutor executor;
     private final String message;
     private final String key;
 
-    public HmacCommand(CommandExecutor executor, String message, String key) {
+    public HmacCommand(BinaryExecutor executor, String message, String key) {
         checkArgument(!isNullOrEmpty(key), "`key` must not be empty");
 
         this.executor = requireNonNull(executor);

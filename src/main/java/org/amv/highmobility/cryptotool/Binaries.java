@@ -7,28 +7,50 @@ import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
 @Slf4j
-public final class BinaryHelper {
-
+public final class Binaries {
     private static final String PATH_TO_BINARY_IN_JAR_WINDOWS = "/cryptotool/bin/crypto-tool.exe";
     private static final String PATH_TO_BINARY_IN_JAR_UNIX = "/cryptotool/bin/crypto-tool";
     private static final String PATH_TO_BINARY_IN_JAR_UNIX_REDHAT = "/cryptotool/bin/crypto-tool-fedora";
 
     private static final String TARGET_BINARY_NAME = "crypto-tool";
 
-    private BinaryHelper() {
+    private Binaries() {
         throw new UnsupportedOperationException();
     }
 
-    public static File getCryptotoolBinary() throws URISyntaxException, IOException {
+    public static Binary defaultBinary() throws IOException {
+        return BinaryImpl.builder()
+                .file(copyBinaryFromJarToDisk(findPathToDefaultBinaryInJar()))
+                .build();
+    }
+
+    public static Binary windowsBinary() throws IOException {
+        return BinaryImpl.builder()
+                .file(copyBinaryFromJarToDisk(PATH_TO_BINARY_IN_JAR_WINDOWS))
+                .build();
+    }
+
+    public static Binary unixBinary() throws IOException {
+        return BinaryImpl.builder()
+                .file(copyBinaryFromJarToDisk(PATH_TO_BINARY_IN_JAR_UNIX))
+                .build();
+    }
+
+    public static Binary redhatBinary() throws IOException {
+        return BinaryImpl.builder()
+                .file(copyBinaryFromJarToDisk(PATH_TO_BINARY_IN_JAR_UNIX_REDHAT))
+                .build();
+    }
+
+    private static File copyBinaryFromJarToDisk(String pathToBinaryInJar) throws IOException {
         File tempDir = Files.createTempDir();
         tempDir.deleteOnExit();
 
-        File file = JarUtil.extractFileFromJarToDisk(getPathToBinaryInJar(),
+        File file = JarUtil.extractFileFromJarToDisk(pathToBinaryInJar,
                 tempDir.getAbsolutePath(),
                 TARGET_BINARY_NAME);
         File executableFile = makeFileExecutableOrThrow(file);
@@ -49,7 +71,7 @@ public final class BinaryHelper {
         return file;
     }
 
-    private static String getPathToBinaryInJar() throws URISyntaxException, IOException {
+    private static String findPathToDefaultBinaryInJar() throws IOException {
         boolean isOsSupported = SystemUtils.IS_OS_WINDOWS || SystemUtils.IS_OS_UNIX;
         checkArgument(isOsSupported, "Unsupported operating system");
 

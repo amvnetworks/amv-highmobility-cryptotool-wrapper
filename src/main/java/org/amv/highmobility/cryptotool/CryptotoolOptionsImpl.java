@@ -1,28 +1,25 @@
 package org.amv.highmobility.cryptotool;
 
-import com.google.common.io.Files;
 import lombok.Builder;
 import lombok.Value;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
+import static java.util.Objects.requireNonNull;
 
 @Value
 @Builder(builderClassName = "Builder")
 public class CryptotoolOptionsImpl implements CryptotoolOptions {
 
     public static CryptotoolOptionsImpl createDefault() {
-        try {
-            return CryptotoolOptionsImpl.builder()
-                    .pathToExecutable(BinaryHelper.getCryptotoolBinary())
-                    .workingDirectory(Files.createTempDir())
-                    .build();
-        } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException("Error creating default cryptotool instance", e);
-        }
+        return CryptotoolOptionsImpl.builder()
+                .binaryExecutor(BinaryExecutorImpl.createDefault())
+                .build();
     }
 
-    private File pathToExecutable;
-    private File workingDirectory;
+    private final BinaryExecutor binaryExecutor;
+
+    public CryptotoolOptionsImpl(BinaryExecutor binaryExecutor) {
+        requireNonNull(binaryExecutor, "`binaryExecutor` must not be null");
+
+        this.binaryExecutor = binaryExecutor;
+    }
 }

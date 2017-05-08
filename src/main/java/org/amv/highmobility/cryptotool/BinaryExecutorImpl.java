@@ -1,13 +1,12 @@
-package org.amv.highmobility.cryptotool.command;
+package org.amv.highmobility.cryptotool;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.io.Files;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.amv.highmobility.cryptotool.CryptotoolOptions;
-import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -16,36 +15,53 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
-import java.util.function.Predicate;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
-public class CommandExecutor {
+@Value
+@Builder(builderClassName = "Builder")
+public class BinaryExecutorImpl implements BinaryExecutor {
 
-    private final CryptotoolOptions options;
-
-    public CommandExecutor(CryptotoolOptions options) throws IllegalArgumentException {
-        this.options = requireNonNull(options, "`options` must not be null")
-                .validOrThrow();
+    public static BinaryExecutorImpl createDefault() {
+        try {
+            final Binary binary = Binaries.defaultBinary();
+            final File workingDirectory = Files.createTempDir();
+            return BinaryExecutorImpl.builder()
+                    .binary(binary)
+                    .workingDirectory(workingDirectory)
+                    .build();
+        } catch (IOException e) {
+            throw new RuntimeException("Error creating default binary executor", e);
+        }
     }
 
-    public Flux<ProcessWrapper.ProcessResult> execute(String arg) {
-        return execute(Collections.singletonList(arg));
+    private final Binary binary;
+    private final File workingDirectory;
+
+    public BinaryExecutorImpl(Binary binary, File workingDirectory) throws IllegalArgumentException {
+        requireNonNull(binary, "`binary` must not be null");
+        requireNonNull(workingDirectory, "`workingDirectory` must not be null");
+        checkArgument(workingDirectory.exists(), "`workingDirectory` does not exist");
+
+        this.binary = binary;
+        this.workingDirectory = workingDirectory;
     }
 
-    public Flux<ProcessWrapper.ProcessResult> execute(List<String> args) {
+    @Override
+    public Flux<ProcessResult> execute(List<String> args) {
         requireNonNull(args);
 
         ImmutableList<String> commands = ImmutableList.<String>builder()
-                .add(this.options.getPathToExecutable().getAbsolutePath())
+                .add(this.binary.getFile().getAbsolutePath())
                 .addAll(args)
                 .build();
 
         ProcessWrapper processWrapper = new ProcessWrapper(
-                this.options.getWorkingDirectory(),
+                this.workingDirectory,
                 commands,
                 Collections.emptyMap());
 
@@ -61,7 +77,7 @@ public class CommandExecutor {
      * A wrapper for the {@link ProcessBuilder} that reads all relevant streams which can cause a 'hanging'
      * {@link Process}. The read data of the streams is provided as strings.
      */
-    static class ProcessWrapper {
+    private static class ProcessWrapper {
         private final File directory;
         private final List<String> commands;
         private final Map<String, String> environment;
@@ -136,27 +152,5 @@ public class CommandExecutor {
             }
         }
 
-        @Value
-        @Builder(builderClassName = "Builder")
-        static class ProcessResult {
-            private List<String> errors;
-            private List<String> output;
-            private int status;
-
-            boolean hasErrors() {
-                return !getErrors().isEmpty();
-            }
-
-            List<String> getCleanedOutput() {
-                Predicate<String> isNewLine = line -> "\n".equals(line) || System.lineSeparator().equals(line);
-                Predicate<String> isEmptyLine = StringUtils::isBlank;
-
-                return getOutput().stream()
-                        .filter(isEmptyLine.negate())
-                        .filter(isNewLine.negate())
-                        .collect(toList());
-            }
-
-        }
     }
 }

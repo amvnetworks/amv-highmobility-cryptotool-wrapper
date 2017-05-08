@@ -1,6 +1,7 @@
 package org.amv.highmobility.cryptotool.command;
 
 
+import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool;
 import org.amv.highmobility.cryptotool.CryptotoolImpl;
 import reactor.core.publisher.Flux;
@@ -11,9 +12,9 @@ import static java.util.Objects.requireNonNull;
 
 public class KeysCommand implements Command<Cryptotool.Keys> {
 
-    private final CommandExecutor executor;
+    private final BinaryExecutor executor;
 
-    public KeysCommand(CommandExecutor executor) {
+    public KeysCommand(BinaryExecutor executor) {
         this.executor = requireNonNull(executor);
     }
 

@@ -2,6 +2,7 @@ package org.amv.highmobility.cryptotool.command;
 
 
 import com.google.common.collect.ImmutableList;
+import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool;
 import reactor.core.publisher.Flux;
 
@@ -13,12 +14,12 @@ import static java.util.Objects.requireNonNull;
 
 public class HmacVerifyCommand implements Command<Cryptotool.Validity> {
 
-    private final CommandExecutor executor;
+    private final BinaryExecutor executor;
     private final String message;
     private final String key;
     private final String hmac;
 
-    public HmacVerifyCommand(CommandExecutor executor, String message, String key, String hmac) {
+    public HmacVerifyCommand(BinaryExecutor executor, String message, String key, String hmac) {
         checkArgument(!isNullOrEmpty(key), "`signature` must not be empty");
         checkArgument(!isNullOrEmpty(hmac), "`publicKey` must not be empty");
 

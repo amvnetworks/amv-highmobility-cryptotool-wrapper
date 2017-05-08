@@ -2,6 +2,7 @@ package org.amv.highmobility.cryptotool.command;
 
 
 import com.google.common.collect.ImmutableList;
+import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool;
 import org.amv.highmobility.cryptotool.CryptotoolImpl;
 import reactor.core.publisher.Flux;
@@ -16,14 +17,14 @@ import static java.util.Objects.requireNonNull;
 
 public class AccessCommand implements Command<Cryptotool.AccessCertificate> {
 
-    private final CommandExecutor executor;
+    private final BinaryExecutor executor;
     private final String gainingSerial;
     private final String publicKey;
     private final String providingSerial;
     private final LocalDateTime startDate;
     private final LocalDateTime endDate;
 
-    public AccessCommand(CommandExecutor executor, String gainingSerial, String publicKey, String providingSerial, LocalDateTime startDate, LocalDateTime endDate) {
+    public AccessCommand(BinaryExecutor executor, String gainingSerial, String publicKey, String providingSerial, LocalDateTime startDate, LocalDateTime endDate) {
         checkArgument(!isNullOrEmpty(gainingSerial), "`gainingSerial` must not be empty");
         checkArgument(!isNullOrEmpty(publicKey), "`publicKey` must not be empty");
         checkArgument(!isNullOrEmpty(providingSerial), "`providingSerial` must not be empty");

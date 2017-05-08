@@ -16,23 +16,22 @@ import static java.util.Objects.requireNonNull;
 @Slf4j
 public class CryptotoolImpl implements Cryptotool {
 
-    private final CryptotoolOptions options;
-    private final CommandExecutor commandExecutor;
+    private final BinaryExecutor binaryExecutor;
 
     public CryptotoolImpl(CryptotoolOptions options) throws IllegalArgumentException {
-        this.options = requireNonNull(options, "`options` must not be null")
-                .validOrThrow();
-        this.commandExecutor = new CommandExecutor(options);
+        requireNonNull(options, "`options` must not be null");
+        
+        this.binaryExecutor = requireNonNull(options.getBinaryExecutor());
     }
 
     @Override
     public Mono<Version> version() {
-        return new VersionCommand(commandExecutor).execute()
+        return new VersionCommand(binaryExecutor).execute()
                 .single();
     }
 
     public Mono<Keys> generateKeys() {
-        return new KeysCommand(commandExecutor).execute()
+        return new KeysCommand(binaryExecutor).execute()
                 .single();
     }
 
@@ -41,7 +40,7 @@ public class CryptotoolImpl implements Cryptotool {
         requireNonNull(message, "`message` must not be null");
         checkArgument(!isNullOrEmpty(privateKey), "`privateKey` must not be empty");
 
-        return new SignCommand(commandExecutor, message, privateKey).execute()
+        return new SignCommand(binaryExecutor, message, privateKey).execute()
                 .single();
     }
 
@@ -51,7 +50,7 @@ public class CryptotoolImpl implements Cryptotool {
         checkArgument(!isNullOrEmpty(signature), "`signature` must not be empty");
         checkArgument(!isNullOrEmpty(publicKey), "`publicKey` must not be empty");
 
-        return new VerifyCommand(commandExecutor, message, signature, publicKey).execute()
+        return new VerifyCommand(binaryExecutor, message, signature, publicKey).execute()
                 .single();
     }
 
@@ -60,7 +59,7 @@ public class CryptotoolImpl implements Cryptotool {
         requireNonNull(message, "`message` must not be null");
         checkArgument(!isNullOrEmpty(key), "`key` must not be empty");
 
-        return new HmacCommand(commandExecutor, message, key).execute()
+        return new HmacCommand(binaryExecutor, message, key).execute()
                 .single();
     }
 
@@ -70,7 +69,7 @@ public class CryptotoolImpl implements Cryptotool {
         checkArgument(!isNullOrEmpty(key), "`key` must not be empty");
         checkArgument(!isNullOrEmpty(hmac), "`hmac` must not be empty");
 
-        return new HmacVerifyCommand(commandExecutor, message, key, hmac).execute()
+        return new HmacVerifyCommand(binaryExecutor, message, key, hmac).execute()
                 .single();
     }
 
@@ -88,7 +87,7 @@ public class CryptotoolImpl implements Cryptotool {
         requireNonNull(endDate, "`endDate` must not be null");
         checkArgument(startDate.isBefore(endDate), "`startDate` must not be after `endDate`");
 
-        return new AccessCommand(commandExecutor, gainingSerial, publicKey, providingSerial, startDate, endDate)
+        return new AccessCommand(binaryExecutor, gainingSerial, publicKey, providingSerial, startDate, endDate)
                 .execute()
                 .single();
     }
@@ -103,7 +102,7 @@ public class CryptotoolImpl implements Cryptotool {
         checkArgument(!isNullOrEmpty(serial), "`serial` must not be empty");
         checkArgument(!isNullOrEmpty(publicKey), "`publicKey` must not be empty");
 
-        return new DeviceCommand(commandExecutor, issuer, appId, serial, publicKey).execute()
+        return new DeviceCommand(binaryExecutor, issuer, appId, serial, publicKey).execute()
                 .single();
     }
 
