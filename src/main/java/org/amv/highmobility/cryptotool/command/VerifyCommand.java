@@ -1,7 +1,8 @@
 package org.amv.highmobility.cryptotool.command;
 
-
 import com.google.common.collect.ImmutableList;
+import lombok.Builder;
+import lombok.Value;
 import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool;
 import reactor.core.publisher.Flux;
@@ -12,25 +13,26 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 
+@Value
+@Builder(builderClassName = "Builder")
 public class VerifyCommand implements Command<Cryptotool.Validity> {
 
-    private final BinaryExecutor executor;
     private final String message;
     private final String signature;
     private final String publicKey;
 
-    public VerifyCommand(BinaryExecutor executor, String message, String signature, String publicKey) {
+    public VerifyCommand(String message, String signature, String publicKey) {
+        requireNonNull(message, "`message` must not be null");
         checkArgument(!isNullOrEmpty(signature), "`signature` must not be empty");
         checkArgument(!isNullOrEmpty(publicKey), "`publicKey` must not be empty");
 
-        this.executor = requireNonNull(executor);
-        this.message = requireNonNull(message, "`message` must not be null");
-        this.signature = requireNonNull(signature, "`signature` must not be null");
-        this.publicKey = requireNonNull(publicKey, "`publicKey` must not be null");
+        this.message = message;
+        this.signature = signature;
+        this.publicKey = publicKey;
     }
 
     @Override
-    public Flux<Cryptotool.Validity> execute() {
+    public Flux<Cryptotool.Validity> execute(BinaryExecutor executor) {
 
         List<String> args = ImmutableList.<String>builder()
                 .add("verify")

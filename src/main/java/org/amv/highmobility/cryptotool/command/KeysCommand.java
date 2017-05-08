@@ -1,6 +1,7 @@
 package org.amv.highmobility.cryptotool.command;
 
-
+import lombok.Builder;
+import lombok.Value;
 import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool;
 import org.amv.highmobility.cryptotool.CryptotoolImpl;
@@ -10,16 +11,12 @@ import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 
+@Value
+@Builder(builderClassName = "Builder")
 public class KeysCommand implements Command<Cryptotool.Keys> {
 
-    private final BinaryExecutor executor;
-
-    public KeysCommand(BinaryExecutor executor) {
-        this.executor = requireNonNull(executor);
-    }
-
     @Override
-    public Flux<Cryptotool.Keys> execute() {
+    public Flux<Cryptotool.Keys> execute(BinaryExecutor executor) {
         String privateKeyPrefix = "PRIVATE: ";
         String publicKeyPrefix = "PUBLIC: ";
 

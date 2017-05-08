@@ -1,7 +1,8 @@
 package org.amv.highmobility.cryptotool.command;
 
-
 import com.google.common.collect.ImmutableList;
+import lombok.Builder;
+import lombok.Value;
 import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool;
 import org.amv.highmobility.cryptotool.CryptotoolImpl;
@@ -13,21 +14,20 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 
+@Value
+@Builder(builderClassName = "Builder")
 public class DeviceCommand implements Command<Cryptotool.DeviceCertificate> {
 
-    private final BinaryExecutor executor;
     private final String issuer;
     private final String appId;
     private final String serial;
     private final String publicKey;
 
-    public DeviceCommand(BinaryExecutor executor, String issuer, String appId, String serial, String publicKey) {
+    public DeviceCommand(String issuer, String appId, String serial, String publicKey) {
         checkArgument(!isNullOrEmpty(issuer), "`issuer` must not be empty");
         checkArgument(!isNullOrEmpty(appId), "`appId` must not be empty");
         checkArgument(!isNullOrEmpty(serial), "`serial` must not be empty");
-        checkArgument(!isNullOrEmpty(publicKey), "`publicKey` must not be empty");
 
-        this.executor = requireNonNull(executor);
         this.issuer = issuer;
         this.appId = appId;
         this.serial = serial;
@@ -35,7 +35,7 @@ public class DeviceCommand implements Command<Cryptotool.DeviceCertificate> {
     }
 
     @Override
-    public Flux<Cryptotool.DeviceCertificate> execute() {
+    public Flux<Cryptotool.DeviceCertificate> execute(BinaryExecutor executor) {
         List<String> args = ImmutableList.<String>builder()
                 .add("device")
                 .add(issuer)

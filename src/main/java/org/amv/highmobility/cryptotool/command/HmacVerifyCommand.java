@@ -1,7 +1,8 @@
 package org.amv.highmobility.cryptotool.command;
 
-
 import com.google.common.collect.ImmutableList;
+import lombok.Builder;
+import lombok.Value;
 import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool;
 import reactor.core.publisher.Flux;
@@ -12,25 +13,26 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 
+@Value
+@Builder(builderClassName = "Builder")
 public class HmacVerifyCommand implements Command<Cryptotool.Validity> {
 
-    private final BinaryExecutor executor;
     private final String message;
     private final String key;
     private final String hmac;
 
-    public HmacVerifyCommand(BinaryExecutor executor, String message, String key, String hmac) {
-        checkArgument(!isNullOrEmpty(key), "`signature` must not be empty");
-        checkArgument(!isNullOrEmpty(hmac), "`publicKey` must not be empty");
+    public HmacVerifyCommand(String message, String key, String hmac) {
+        requireNonNull(message, "`message` must not be null");
+        checkArgument(!isNullOrEmpty(key), "`key` must not be empty");
+        checkArgument(!isNullOrEmpty(hmac), "`hmac` must not be empty");
 
-        this.executor = requireNonNull(executor);
-        this.message = requireNonNull(message, "`message` must not be null");
-        this.key = requireNonNull(key, "`key` must not be null");
-        this.hmac = requireNonNull(hmac, "`hmac` must not be null");
+        this.message = message;
+        this.key = key;
+        this.hmac = hmac;
     }
 
     @Override
-    public Flux<Cryptotool.Validity> execute() {
+    public Flux<Cryptotool.Validity> execute(BinaryExecutor executor) {
         List<String> args = ImmutableList.<String>builder()
                 .add("hmacver")
                 .add(message)

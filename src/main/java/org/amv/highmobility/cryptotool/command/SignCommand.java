@@ -1,7 +1,8 @@
 package org.amv.highmobility.cryptotool.command;
 
-
 import com.google.common.collect.ImmutableList;
+import lombok.Builder;
+import lombok.Value;
 import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool;
 import org.amv.highmobility.cryptotool.CryptotoolImpl;
@@ -13,22 +14,23 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 
+@Value
+@Builder(builderClassName = "Builder")
 public class SignCommand implements Command<Cryptotool.Signature> {
 
-    private final BinaryExecutor executor;
     private final String message;
     private final String privateKey;
 
-    public SignCommand(BinaryExecutor executor, String message, String privateKey) {
+    public SignCommand(String message, String privateKey) {
+        requireNonNull(message, "`message` must not be null");
         checkArgument(!isNullOrEmpty(privateKey), "`privateKey` must not be empty");
 
-        this.executor = requireNonNull(executor);
-        this.message = requireNonNull(message, "`message` must not be null");
-        this.privateKey = requireNonNull(privateKey, "`privateKey` must not be null");
+        this.message = message;
+        this.privateKey = privateKey;
     }
 
     @Override
-    public Flux<Cryptotool.Signature> execute() {
+    public Flux<Cryptotool.Signature> execute(BinaryExecutor executor) {
         List<String> args = ImmutableList.<String>builder()
                 .add("sign")
                 .add(message)

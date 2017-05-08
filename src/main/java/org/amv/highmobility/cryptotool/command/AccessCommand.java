@@ -1,7 +1,8 @@
 package org.amv.highmobility.cryptotool.command;
 
-
 import com.google.common.collect.ImmutableList;
+import lombok.Builder;
+import lombok.Value;
 import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool;
 import org.amv.highmobility.cryptotool.CryptotoolImpl;
@@ -15,16 +16,16 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 
+@Value
+@Builder(builderClassName = "Builder")
 public class AccessCommand implements Command<Cryptotool.AccessCertificate> {
-
-    private final BinaryExecutor executor;
     private final String gainingSerial;
     private final String publicKey;
     private final String providingSerial;
     private final LocalDateTime startDate;
     private final LocalDateTime endDate;
 
-    public AccessCommand(BinaryExecutor executor, String gainingSerial, String publicKey, String providingSerial, LocalDateTime startDate, LocalDateTime endDate) {
+    public AccessCommand(String gainingSerial, String publicKey, String providingSerial, LocalDateTime startDate, LocalDateTime endDate) {
         checkArgument(!isNullOrEmpty(gainingSerial), "`gainingSerial` must not be empty");
         checkArgument(!isNullOrEmpty(publicKey), "`publicKey` must not be empty");
         checkArgument(!isNullOrEmpty(providingSerial), "`providingSerial` must not be empty");
@@ -32,7 +33,6 @@ public class AccessCommand implements Command<Cryptotool.AccessCertificate> {
         requireNonNull(endDate, "`endDate` must not be null");
         checkArgument(startDate.isBefore(endDate), "`startDate` must not be after `endDate`");
 
-        this.executor = requireNonNull(executor);
         this.gainingSerial = gainingSerial;
         this.publicKey = publicKey;
         this.providingSerial = providingSerial;
@@ -41,7 +41,9 @@ public class AccessCommand implements Command<Cryptotool.AccessCertificate> {
     }
 
     @Override
-    public Flux<Cryptotool.AccessCertificate> execute() {
+    public Flux<Cryptotool.AccessCertificate> execute(BinaryExecutor executor) {
+        requireNonNull(executor);
+
         String startDateAsString = startDate.format(DateTimeFormatter.ofPattern("YYMMddHHmm"));
         String endDateAsString = endDate.format(DateTimeFormatter.ofPattern("YYMMddHHmm"));
 

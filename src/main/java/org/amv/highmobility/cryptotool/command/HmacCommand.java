@@ -1,7 +1,8 @@
 package org.amv.highmobility.cryptotool.command;
 
-
 import com.google.common.collect.ImmutableList;
+import lombok.Builder;
+import lombok.Value;
 import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool;
 import org.amv.highmobility.cryptotool.CryptotoolImpl;
@@ -13,22 +14,24 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 
+@Value
+@Builder(builderClassName = "Builder")
 public class HmacCommand implements Command<Cryptotool.Hmac> {
 
-    private final BinaryExecutor executor;
     private final String message;
     private final String key;
 
-    public HmacCommand(BinaryExecutor executor, String message, String key) {
+    public HmacCommand(String message, String key) {
+        requireNonNull(message, "`message` must not be null");
         checkArgument(!isNullOrEmpty(key), "`key` must not be empty");
 
-        this.executor = requireNonNull(executor);
-        this.message = requireNonNull(message, "`message` must not be null");
-        this.key = requireNonNull(key, "`key` must not be null");
+        this.message = message;
+        this.key = key;
     }
 
     @Override
-    public Flux<Cryptotool.Hmac> execute() {
+    public Flux<Cryptotool.Hmac> execute(BinaryExecutor executor) {
+        requireNonNull(executor);
 
         List<String> args = ImmutableList.<String>builder()
                 .add("hmac")

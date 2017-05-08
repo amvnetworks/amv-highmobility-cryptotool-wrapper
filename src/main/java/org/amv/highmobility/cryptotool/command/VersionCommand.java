@@ -1,23 +1,18 @@
 package org.amv.highmobility.cryptotool.command;
 
-
+import lombok.Builder;
+import lombok.Value;
 import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool.Version;
 import org.amv.highmobility.cryptotool.CryptotoolImpl;
 import reactor.core.publisher.Flux;
 
-import static java.util.Objects.requireNonNull;
-
+@Value
+@Builder(builderClassName = "Builder")
 public class VersionCommand implements Command<Version> {
 
-    private final BinaryExecutor executor;
-
-    public VersionCommand(BinaryExecutor executor) {
-        this.executor = requireNonNull(executor);
-    }
-
     @Override
-    public Flux<Version> execute() {
+    public Flux<Version> execute(BinaryExecutor executor) {
         String versionPrefix = "Cryptotool version";
         return executor.execute("-v")
                 .map(processResult -> CommandHelper.parseValueWithPrefix(versionPrefix, processResult.getCleanedOutput())

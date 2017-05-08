@@ -9,67 +9,79 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
 public class CryptotoolImpl implements Cryptotool {
 
     private final BinaryExecutor binaryExecutor;
+    private final CryptotoolOptions options;
 
     public CryptotoolImpl(CryptotoolOptions options) throws IllegalArgumentException {
-        requireNonNull(options, "`options` must not be null");
-        
+        this.options = requireNonNull(options, "`options` must not be null");
         this.binaryExecutor = requireNonNull(options.getBinaryExecutor());
     }
 
     @Override
     public Mono<Version> version() {
-        return new VersionCommand(binaryExecutor).execute()
+        return VersionCommand.builder()
+                .build()
+                .execute(binaryExecutor)
+                .timeout(options.getCommandTimeout())
                 .single();
     }
 
     public Mono<Keys> generateKeys() {
-        return new KeysCommand(binaryExecutor).execute()
+        return KeysCommand.builder()
+                .build()
+                .execute(binaryExecutor)
+                .timeout(options.getCommandTimeout())
                 .single();
     }
 
     @Override
     public Mono<Signature> generateSignature(String message, String privateKey) {
-        requireNonNull(message, "`message` must not be null");
-        checkArgument(!isNullOrEmpty(privateKey), "`privateKey` must not be empty");
-
-        return new SignCommand(binaryExecutor, message, privateKey).execute()
+        return SignCommand.builder()
+                .message(message)
+                .privateKey(privateKey)
+                .build()
+                .execute(binaryExecutor)
+                .timeout(options.getCommandTimeout())
                 .single();
     }
 
     @Override
     public Mono<Validity> verifySignature(String message, String signature, String publicKey) {
-        requireNonNull(message, "`message` must not be null");
-        checkArgument(!isNullOrEmpty(signature), "`signature` must not be empty");
-        checkArgument(!isNullOrEmpty(publicKey), "`publicKey` must not be empty");
-
-        return new VerifyCommand(binaryExecutor, message, signature, publicKey).execute()
+        return VerifyCommand.builder()
+                .message(message)
+                .signature(signature)
+                .publicKey(publicKey)
+                .build()
+                .execute(binaryExecutor)
+                .timeout(options.getCommandTimeout())
                 .single();
     }
 
     @Override
     public Mono<Hmac> generateHmac(String message, String key) {
-        requireNonNull(message, "`message` must not be null");
-        checkArgument(!isNullOrEmpty(key), "`key` must not be empty");
-
-        return new HmacCommand(binaryExecutor, message, key).execute()
+        return HmacCommand.builder()
+                .message(message)
+                .key(key)
+                .build()
+                .execute(binaryExecutor)
+                .timeout(options.getCommandTimeout())
                 .single();
     }
 
     @Override
     public Mono<Validity> verifyHmac(String message, String key, String hmac) {
-        requireNonNull(message, "`message` must not be null");
-        checkArgument(!isNullOrEmpty(key), "`key` must not be empty");
-        checkArgument(!isNullOrEmpty(hmac), "`hmac` must not be empty");
-
-        return new HmacVerifyCommand(binaryExecutor, message, key, hmac).execute()
+        return HmacVerifyCommand.builder()
+                .message(message)
+                .key(key)
+                .hmac(hmac)
+                .build()
+                .execute(binaryExecutor)
+                .timeout(options.getCommandTimeout())
                 .single();
     }
 
@@ -80,15 +92,15 @@ public class CryptotoolImpl implements Cryptotool {
                                                            LocalDateTime startDate,
                                                            LocalDateTime endDate,
                                                            Collection<String> permissions) {
-        checkArgument(!isNullOrEmpty(gainingSerial), "`gainingSerial` must not be empty");
-        checkArgument(!isNullOrEmpty(publicKey), "`publicKey` must not be empty");
-        checkArgument(!isNullOrEmpty(providingSerial), "`providingSerial` must not be empty");
-        requireNonNull(startDate, "`startDate` must not be null");
-        requireNonNull(endDate, "`endDate` must not be null");
-        checkArgument(startDate.isBefore(endDate), "`startDate` must not be after `endDate`");
-
-        return new AccessCommand(binaryExecutor, gainingSerial, publicKey, providingSerial, startDate, endDate)
-                .execute()
+        return AccessCommand.builder()
+                .gainingSerial(gainingSerial)
+                .publicKey(publicKey)
+                .providingSerial(providingSerial)
+                .startDate(startDate)
+                .endDate(endDate)
+                .build()
+                .execute(binaryExecutor)
+                .timeout(options.getCommandTimeout())
                 .single();
     }
 
@@ -97,12 +109,14 @@ public class CryptotoolImpl implements Cryptotool {
                                                            String appId,
                                                            String serial,
                                                            String publicKey) {
-        checkArgument(!isNullOrEmpty(issuer), "`issuer` must not be empty");
-        checkArgument(!isNullOrEmpty(appId), "`appId` must not be empty");
-        checkArgument(!isNullOrEmpty(serial), "`serial` must not be empty");
-        checkArgument(!isNullOrEmpty(publicKey), "`publicKey` must not be empty");
-
-        return new DeviceCommand(binaryExecutor, issuer, appId, serial, publicKey).execute()
+        return DeviceCommand.builder()
+                .issuer(issuer)
+                .appId(appId)
+                .serial(serial)
+                .publicKey(publicKey)
+                .build()
+                .execute(binaryExecutor)
+                .timeout(options.getCommandTimeout())
                 .single();
     }
 
