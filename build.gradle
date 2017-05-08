@@ -18,6 +18,7 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
+apply plugin: 'jacoco'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'io.franzbecker.gradle-lombok'
 
@@ -149,8 +150,20 @@ if (project.hasProperty('release')) {
 }
 
 test {
+    // Generate code coverage reports ... run with jacoco
+    jacocoTestReport{
+        additionalSourceDirs = files(sourceSets.main.allJava.srcDirs)
+        reports {
+            xml.enabled true
+            csv.enabled false
+            html.destination "${buildDir}/reports/jacoco/html"
+        }
+        executionData = files("${buildDir}/jacoco/test.exec")
+    }
+
     // * enable on demand
     // testLogging.showStandardStreams = true
+    finalizedBy jacocoTestReport
 }
 
 tasks.withType(Test) {
