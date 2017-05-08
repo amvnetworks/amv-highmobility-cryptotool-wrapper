@@ -86,8 +86,7 @@ public class CommandExecutor {
                     log.debug("Executed: {}", commands.stream().collect(joining(" ")));
                 }
                 return pb.start();
-            })
-                    .flatMap(this::readProcessOutput);
+            }).flatMap(this::readProcessOutput);
         }
 
         private Mono<ProcessResult> readProcessOutput(Process process) {
@@ -132,22 +131,23 @@ public class CommandExecutor {
             @Override
             public List<String> call() {
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(this.in, Charsets.UTF_8));
-                return bufferedReader.lines().collect(toList());
+                return bufferedReader.lines()
+                        .collect(toList());
             }
         }
 
         @Value
         @Builder(builderClassName = "Builder")
-        public static class ProcessResult {
+        static class ProcessResult {
             private List<String> errors;
             private List<String> output;
             private int status;
 
-            public boolean hasErrors() {
+            boolean hasErrors() {
                 return !getErrors().isEmpty();
             }
 
-            public List<String> getCleanedOutput() {
+            List<String> getCleanedOutput() {
                 Predicate<String> isNewLine = line -> "\n".equals(line) || System.lineSeparator().equals(line);
                 Predicate<String> isEmptyLine = StringUtils::isBlank;
 

@@ -55,10 +55,10 @@ public final class BinaryHelper {
 
         if (SystemHelper.isWindows()) {
             return PATH_TO_BINARY_IN_JAR_WINDOWS;
+        } else if (SystemHelper.isRedhat()) {
+            return PATH_TO_BINARY_IN_JAR_UNIX_REDHAT;
         } else if (SystemHelper.isLinux()) {
-            return SystemHelper.isRedhat() ?
-                    PATH_TO_BINARY_IN_JAR_UNIX_REDHAT :
-                    PATH_TO_BINARY_IN_JAR_UNIX;
+            return PATH_TO_BINARY_IN_JAR_UNIX;
         }
 
         throw new IllegalStateException("Non compatible operating system for " + TARGET_BINARY_NAME);
