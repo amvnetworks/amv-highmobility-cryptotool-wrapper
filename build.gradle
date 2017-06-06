@@ -7,7 +7,12 @@ buildscript {
         jcenter()
     }
 }
+
 plugins {
+    id 'nebula.project' version '3.4.0'
+    id 'nebula.info' version '3.6.0'
+    id 'nebula.release' version '6.0.0'
+    id 'nebula.lint' version '6.8.0'
     id 'findbugs'
     id 'checkstyle'
     id 'com.jfrog.bintray' version '1.7.3'
@@ -17,16 +22,25 @@ plugins {
 
 apply plugin: 'java'
 apply plugin: 'maven'
-apply plugin: 'maven-publish'
+apply plugin: 'findbugs'
+apply plugin: 'checkstyle'
 apply plugin: 'jacoco'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'io.franzbecker.gradle-lombok'
 
 group = 'org.amv.highmobility'
-version = '0.1.0-SNAPSHOT'
+description = 'A Java wrapper for highmobility cryptotool'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+
+contacts {
+    'devlopment@amv-networks.com' {
+        moniker 'AMV Networks GmbH'
+        role 'owner'
+        github 'amvnetworks'
+    }
+}
 
 repositories {
     jcenter()
@@ -89,19 +103,18 @@ findbugs {
     sourceSets = [sourceSets.main]
 }
 
-tasks.withType(Jar).all { jarTask ->
+jar.doFirst {
+    // other manifest attributes will be populated by nebula.info plugin
+    // see https://github.com/nebula-plugins/gradle-info-plugin
+    def vendor = 'AMV Networks GmbH'
     manifest {
         attributes(
-            'Artifact': project.name,
-            'Group': rootProject.group,
-            'Build-Version': rootProject.version
+                'Specification-Title': project.description,
+                'Specification-Version': project.version,
+                'Specification-Vendor': vendor,
+                'Implementation-Vendor': vendor
         )
     }
-}
-
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
 }
 
 task sourcesJar(type: Jar) {
@@ -113,18 +126,8 @@ artifacts {
     archives javadocJar, sourcesJar
 }
 
-
-// define "publishing" to make `./gradlew publishToMavenLocal` work
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
-}
-
 if (project.hasProperty('release')) {
-    if (rootProject.version.contains('SNAPSHOT')) {
+    if (rootProject.version.toString().contains('SNAPSHOT')) {
         throw new GradleException('-Prelease param cannot be used with SNAPSHOT versions')
     }
 
