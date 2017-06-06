@@ -126,9 +126,9 @@ artifacts {
     archives javadocJar, sourcesJar
 }
 
-if (project.hasProperty('release')) {
+if (project.hasProperty('releaseToBintray')) {
     if (rootProject.version.toString().contains('SNAPSHOT')) {
-        throw new GradleException('-Prelease param cannot be used with SNAPSHOT versions')
+        throw new GradleException('-PreleaseToBintray param cannot be used with SNAPSHOT versions')
     }
 
     bintray {
