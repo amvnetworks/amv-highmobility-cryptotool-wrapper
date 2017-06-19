@@ -33,7 +33,7 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    public void itSouldHaveAnElegantConstructionMechanism() {
+    public void itShouldHaveAnElegantConstructionMechanism() {
         Cryptotool cryptotool = new CryptotoolImpl(CryptotoolOptionsImpl.createDefault());
 
         assertThat(cryptotool, Matchers.is(Matchers.notNullValue()));
