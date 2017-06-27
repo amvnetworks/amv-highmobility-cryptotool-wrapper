@@ -15,6 +15,7 @@ amv-highmobility-cryptotool-wrapper requires Java version 1.8.0_92 or greater.
 ```bash
 ./gradlew clean build bintrayUpload
     -Prelease.stage=final
+    -Prelease.scope=patch
     -PreleaseToBintray
     -PbintrayUser=${username}
     -PbintrayApiKey=${apiKey} 
