@@ -219,7 +219,7 @@ public class CryptotoolImplTest {
         Cryptotool.Keys keys = this.sut.generateKeys()
                 .block();
 
-        String issuer = TestUtils.generateRandomIssuer();
+        String issuer = TestUtils.generateRandomIssuerInHex();
         String appId = TestUtils.generateRandomAppId();
         String serial = TestUtils.generateRandomSerial();
         String publicKey = keys.getPublicKey();

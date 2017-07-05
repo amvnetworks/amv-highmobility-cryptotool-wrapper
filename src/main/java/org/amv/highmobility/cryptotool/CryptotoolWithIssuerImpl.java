@@ -6,8 +6,7 @@ public class CryptotoolWithIssuerImpl extends CryptotoolImpl implements Cryptoto
 
     private final CertificateIssuer certificateIssuer;
 
-    public CryptotoolWithIssuerImpl(CryptotoolOptions options, CertificateIssuer certificateIssuer)
-            throws IllegalArgumentException {
+    public CryptotoolWithIssuerImpl(CryptotoolOptions options, CertificateIssuer certificateIssuer) {
         super(options);
         this.certificateIssuer = requireNonNull(certificateIssuer, "`certificateIssuer` must not be null");
     }

@@ -50,6 +50,7 @@ public class CryptotoolWithIssuerImplTest {
 
         Cryptotool.DeviceCertificate deviceCertificate = this.sut.createDeviceCertificate(appId, serial)
                 .block();
+        
         assertThat(deviceCertificate, is(notNullValue()));
         assertThat(deviceCertificate.getDeviceCertificate(), is(notNullValue()));
     }

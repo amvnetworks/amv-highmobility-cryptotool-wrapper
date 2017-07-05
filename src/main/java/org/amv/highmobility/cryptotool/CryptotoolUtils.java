@@ -1,6 +1,7 @@
 package org.amv.highmobility.cryptotool;
 
 
+import com.google.common.base.Charsets;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -56,8 +57,12 @@ public final class CryptotoolUtils {
             return generateRandomHexString(12);
         }
 
+        public static String generateRandomIssuerInHex() {
+            return Hex.encodeHexString(generateRandomIssuer().getBytes(Charsets.UTF_8));
+        }
+
         public static String generateRandomIssuer() {
-            return generateRandomHexString(4);
+            return RandomStringUtils.randomAlphanumeric(4);
         }
     }
 
