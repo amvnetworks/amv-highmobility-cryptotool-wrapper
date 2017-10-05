@@ -2,6 +2,7 @@ package org.amv.highmobility.cryptotool;
 
 import org.amv.highmobility.cryptotool.CryptotoolUtils.TestUtils;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.event.Level;
 
@@ -14,12 +15,17 @@ public class CryptotoolWithIssuerImplTest {
         System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, Level.DEBUG.name());
     }
 
+    private static CryptotoolOptions cryptotoolOptions;
+
     private CryptotoolWithIssuer sut;
+
+    @BeforeClass
+    public static void setUpClass() {
+        CryptotoolWithIssuerImplTest.cryptotoolOptions = CryptotoolOptionsImpl.createDefault();
+    }
 
     @Before
     public void setUp() {
-        CryptotoolOptions cryptotoolOptions = CryptotoolOptionsImpl.createDefault();
-
         Cryptotool cryptotool = new CryptotoolImpl(cryptotoolOptions);
 
         CryptotoolWithIssuer.CertificateIssuer certificateIssuer = CryptotoolWithIssuer.CertificateIssuerImpl.builder()

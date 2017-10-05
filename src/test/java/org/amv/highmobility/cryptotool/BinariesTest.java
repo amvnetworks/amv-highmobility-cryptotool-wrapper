@@ -12,24 +12,32 @@ public class BinariesTest {
     public void defaultBinary() throws Exception {
         final Binary binary = Binaries.defaultBinary();
         assertThat(binary, is(notNullValue()));
+
+        binary.getFile().delete();
     }
 
     @Test
     public void windowsBinary() throws Exception {
         final Binary binary = Binaries.windowsBinary();
         assertThat(binary, is(notNullValue()));
+
+        binary.getFile().delete();
     }
 
     @Test
     public void unixBinary() throws Exception {
         final Binary binary = Binaries.unixBinary();
         assertThat(binary, is(notNullValue()));
+
+        binary.getFile().delete();
     }
 
     @Test
     public void redhatBinary() throws Exception {
         final Binary binary = Binaries.redhatBinary();
         assertThat(binary, is(notNullValue()));
+
+        binary.getFile().delete();
     }
 
 }

@@ -6,6 +6,7 @@ import org.amv.highmobility.cryptotool.CryptotoolUtils.TestUtils;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.event.Level;
@@ -23,12 +24,17 @@ public class CryptotoolImplTest {
         System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, Level.DEBUG.name());
     }
 
+    private static CryptotoolOptions cryptotoolOptions;
+
     private Cryptotool sut;
+
+    @BeforeClass
+    public static void setUpClass() {
+        CryptotoolImplTest.cryptotoolOptions = CryptotoolOptionsImpl.createDefault();
+    }
 
     @Before
     public void setUp() {
-        CryptotoolOptions cryptotoolOptions = CryptotoolOptionsImpl.createDefault();
-
         this.sut = new CryptotoolImpl(cryptotoolOptions);
     }
 
