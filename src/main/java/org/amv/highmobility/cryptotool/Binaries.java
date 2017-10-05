@@ -13,7 +13,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 @Slf4j
 public final class Binaries {
     private static final String PATH_TO_BINARY_IN_JAR_WINDOWS = "/cryptotool/bin/crypto-tool.exe";
-    private static final String PATH_TO_BINARY_IN_JAR_UNIX = "/cryptotool/bin/crypto-tool";
+    private static final String PATH_TO_BINARY_IN_JAR_UNIX = "/cryptotool/bin/crypto-tool-deb64";
     private static final String PATH_TO_BINARY_IN_JAR_UNIX_REDHAT = "/cryptotool/bin/crypto-tool-fedora";
 
     private static final String TARGET_BINARY_NAME = "crypto-tool";
