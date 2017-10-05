@@ -6,10 +6,13 @@ amv-highmobility-cryptotool-wrapper
 ========
 amv-highmobility-cryptotool-wrapper requires Java version 1.8.0_92 or greater.
 
+
 # build
 ```bash
 ./gradlew clean build
 ```
+
+# development
 
 ## release to bintray
 ```bash
@@ -25,6 +28,16 @@ amv-highmobility-cryptotool-wrapper requires Java version 1.8.0_92 or greater.
 ```bash
 ./gradlew clean build publishToMavenLocal
 ```
+
+## ide
+this library uses lombok. enable annotation processing in your ide.
+```bash
+./gradlew installLombok
+```
+
+# requirements
+make sure you have installed libssl.so.1.0.0.
+e.g. for [debian (x86_64)](https://packages.debian.org/wheezy/amd64/libssl1.0.0/download)
 
 # usage
 
@@ -109,7 +122,6 @@ cryptotoolWithIssuer.createAccessCertificate(gainingSerial, publicKey, providing
         log.info("access certificate: {}", accessCertificate);
     });
 ```
-
 
 # license
 The project is licensed under the MIT license. See
