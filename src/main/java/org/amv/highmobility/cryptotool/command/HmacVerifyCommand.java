@@ -41,13 +41,14 @@ public class HmacVerifyCommand implements Command<Cryptotool.Validity> {
 
         String signPrefix = "HMAC VERIFY: ";
         return executor.execute(args)
-                .map(result -> result.getCleanedOutput().stream()
+                .map(processResult -> processResult.getCleanedOutput().stream()
                         .filter(line -> line.startsWith(signPrefix))
                         .map(line -> line.replace(signPrefix, ""))
                         .map(String::trim)
                         .filter(val -> "FALSE".equals(val) || "CORRECT".equals(val))
                         .findFirst()
                         .map(val -> "CORRECT".equals(val) ? Cryptotool.Validity.VALID : Cryptotool.Validity.INVALID)
-                        .orElseThrow(() -> new IllegalStateException("Cannot find hmac validity on stdout")));
+                        .orElseThrow(() -> new IllegalStateException("Cannot find hmac validity on stdout",
+                                processResult.getException().orElse(null))));
     }
 }

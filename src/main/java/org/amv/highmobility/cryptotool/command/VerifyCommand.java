@@ -42,13 +42,14 @@ public class VerifyCommand implements Command<Cryptotool.Validity> {
 
         String signPrefix = "VERIFY: ";
         return executor.execute(args)
-                .map(processResult -> processResult.getCleanedOutput().stream()
+                .map(process -> process.getCleanedOutput().stream()
                         .filter(line -> line.startsWith(signPrefix))
                         .map(line -> line.replace(signPrefix, ""))
                         .map(String::trim)
                         .filter(val -> "FALSE".equals(val) || "CORRECT".equals(val))
                         .findFirst()
                         .map(val -> "CORRECT".equals(val) ? Cryptotool.Validity.VALID : Cryptotool.Validity.INVALID)
-                        .orElseThrow(() -> new IllegalStateException("Cannot find signature validity on stdout")));
+                        .orElseThrow(() -> new IllegalStateException("Cannot find signature validity on stdout",
+                                process.getException().orElse(null))));
     }
 }

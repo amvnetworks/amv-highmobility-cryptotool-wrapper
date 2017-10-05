@@ -1,15 +1,12 @@
 package org.amv.highmobility.cryptotool.command;
 
 import lombok.Builder;
-import lombok.Value;
 import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool;
 import org.amv.highmobility.cryptotool.CryptotoolImpl;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
-
-import static java.util.Objects.requireNonNull;
 
 @Builder(builderClassName = "Builder")
 public class KeysCommand implements Command<Cryptotool.Keys> {
@@ -20,14 +17,16 @@ public class KeysCommand implements Command<Cryptotool.Keys> {
         String publicKeyPrefix = "PUBLIC: ";
 
         return executor.execute("keys")
-                .map(process -> {
-                    List<String> stdOutput = process.getCleanedOutput();
+                .map(processResult -> {
+                    List<String> stdOutput = processResult.getCleanedOutput();
 
                     String privateKey = CommandHelper.parseValueWithPrefix(privateKeyPrefix, stdOutput)
-                            .orElseThrow(() -> new IllegalStateException("Cannot find private key on stdout"));
+                            .orElseThrow(() -> new IllegalStateException("Cannot find private key on stdout",
+                                    processResult.getException().orElse(null)));
 
                     String publicKey = CommandHelper.parseValueWithPrefix(publicKeyPrefix, stdOutput)
-                            .orElseThrow(() -> new IllegalStateException("Cannot find public key on stdout"));
+                            .orElseThrow(() -> new IllegalStateException("Cannot find public key on stdout",
+                                    processResult.getException().orElse(null)));
 
                     return CryptotoolImpl.KeysImpl.builder()
                             .privateKey(privateKey)

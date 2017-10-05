@@ -7,6 +7,7 @@ import reactor.core.publisher.Flux;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toList;
@@ -38,6 +39,13 @@ public interface BinaryExecutor {
                     .filter(isEmptyLine.negate())
                     .filter(isNewLine.negate())
                     .collect(toList());
+        }
+
+        public Optional<Throwable> getException() {
+            return errors.stream()
+                    .filter(StringUtils::isNotBlank)
+                    .findFirst()
+                    .map(IllegalStateException::new);
         }
 
     }

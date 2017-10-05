@@ -7,6 +7,8 @@ import org.amv.highmobility.cryptotool.Cryptotool.Version;
 import org.amv.highmobility.cryptotool.CryptotoolImpl;
 import reactor.core.publisher.Flux;
 
+import static org.amv.highmobility.cryptotool.command.CommandHelper.parseValueWithPrefix;
+
 @Builder(builderClassName = "Builder")
 public class VersionCommand implements Command<Version> {
 
@@ -14,8 +16,9 @@ public class VersionCommand implements Command<Version> {
     public Flux<Version> execute(BinaryExecutor executor) {
         String versionPrefix = "Cryptotool version";
         return executor.execute("-v")
-                .map(processResult -> CommandHelper.parseValueWithPrefix(versionPrefix, processResult.getCleanedOutput())
-                        .orElseThrow(() -> new IllegalStateException("Cannot find version on stdout")))
+                .map(process -> parseValueWithPrefix(versionPrefix, process.getCleanedOutput())
+                        .orElseThrow(() -> new IllegalStateException("Cannot find version on stdout",
+                                process.getException().orElse(null))))
                 .map(version -> {
                     String[] majorMinorPatch = version.split("\\.");
                     return CryptotoolImpl.VersionImpl.builder()

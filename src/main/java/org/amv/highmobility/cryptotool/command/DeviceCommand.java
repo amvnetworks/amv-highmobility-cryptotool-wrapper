@@ -14,6 +14,7 @@ import java.util.List;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
+import static org.amv.highmobility.cryptotool.command.CommandHelper.*;
 
 @Builder(builderClassName = "Builder")
 public class DeviceCommand implements Command<Cryptotool.DeviceCertificate> {
@@ -46,8 +47,9 @@ public class DeviceCommand implements Command<Cryptotool.DeviceCertificate> {
 
         String deviceCertPrefix = "DEVICE CERT: ";
         return executor.execute(args)
-                .map(result -> CommandHelper.parseValueWithPrefix(deviceCertPrefix, result.getCleanedOutput())
-                        .orElseThrow(() -> new IllegalStateException("Cannot find device certificate on stdout")))
+                .map(processResult -> parseValueWithPrefix(deviceCertPrefix, processResult.getCleanedOutput())
+                        .orElseThrow(() -> new IllegalStateException("Cannot find device certificate on stdout",
+                                processResult.getException().orElse(null))))
                 .map(deviceCertificate -> CryptotoolImpl.DeviceCertificateImpl.builder()
                         .deviceCertificate(deviceCertificate)
                         .build());
