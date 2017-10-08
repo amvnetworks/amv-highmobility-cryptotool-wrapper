@@ -34,6 +34,18 @@ description = 'A Java wrapper for highmobility cryptotool'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+gradle.taskGraph.whenReady { graph ->
+    def isMinimalBuild = project.hasProperty("minimal")
+
+    def enableAdditionalLongRunningTasks = !isMinimalBuild
+
+    if (!enableAdditionalLongRunningTasks) {
+        findbugsMain.enabled = false
+        checkstyleMain.enabled = false
+        javadoc.enabled = false
+    }
+}
+
 contacts {
     'devlopment@amv-networks.com' {
         moniker 'AMV Networks GmbH'
