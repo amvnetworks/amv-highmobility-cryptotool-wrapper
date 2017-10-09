@@ -14,6 +14,11 @@ amv-highmobility-cryptotool-wrapper requires Java version 1.8.0_92 or greater.
 
 # development
 
+## create a release
+```bash
+./gradlew final -Prelease.scope=patch 
+```
+
 ## release to bintray
 ```bash
 ./gradlew clean build bintrayUpload
