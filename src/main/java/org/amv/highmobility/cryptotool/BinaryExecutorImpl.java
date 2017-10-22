@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
 import lombok.Builder;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -101,7 +100,7 @@ public class BinaryExecutorImpl implements BinaryExecutor {
                     log.debug("Executed: {}", commands.stream().collect(joining(" ")));
                 }
                 return pb.start();
-            }).flatMap(this::readProcessOutput);
+            }).flatMapMany(this::readProcessOutput);
         }
 
         private Mono<ProcessResult> readProcessOutput(Process process) {
