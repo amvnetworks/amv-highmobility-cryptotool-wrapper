@@ -17,13 +17,6 @@ public interface CryptotoolWithIssuer extends Cryptotool {
 
         Cryptotool.Keys getKeys();
 
-        default String getPublicKeyBase64() {
-            return Optional.ofNullable(getKeys())
-                    .map(Keys::getPublicKey)
-                    .map(CryptotoolUtils::encodeHexAsBase64)
-                    .orElseThrow(IllegalStateException::new);
-        }
-
         default String getNameInHex() {
             return Optional.ofNullable(getName())
                     .map(val -> val.getBytes(Charsets.UTF_8))
@@ -61,8 +54,7 @@ public interface CryptotoolWithIssuer extends Cryptotool {
         return verifySignature(message, signature, getCertificateIssuer().getKeys().getPublicKey());
     }
 
-    default Mono<DeviceCertificate> createDeviceCertificate(String appId, String serial) {
-        return createDeviceCertificate(getCertificateIssuer().getNameInHex(), appId, serial,
-                getCertificateIssuer().getKeys().getPublicKey());
+    default Mono<DeviceCertificate> createDeviceCertificate(String appId, String serial, String publicKey) {
+        return createDeviceCertificate(getCertificateIssuer().getNameInHex(), appId, serial, publicKey);
     }
 }

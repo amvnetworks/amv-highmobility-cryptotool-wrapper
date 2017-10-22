@@ -51,12 +51,13 @@ public class CryptotoolWithIssuerImplTest {
 
     @Test
     public void itShouldCreateDeviceCertificate() {
+        Cryptotool.Keys keys = this.sut.generateKeys().block();
         String appId = TestUtils.generateRandomAppId();
         String serial = TestUtils.generateRandomSerial();
 
-        Cryptotool.DeviceCertificate deviceCertificate = this.sut.createDeviceCertificate(appId, serial)
+        Cryptotool.DeviceCertificate deviceCertificate = this.sut.createDeviceCertificate(appId, serial, keys.getPublicKey())
                 .block();
-        
+
         assertThat(deviceCertificate, is(notNullValue()));
         assertThat(deviceCertificate.getDeviceCertificate(), is(notNullValue()));
     }
