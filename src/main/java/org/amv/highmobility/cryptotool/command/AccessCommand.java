@@ -25,20 +25,23 @@ public class AccessCommand implements Command<Cryptotool.AccessCertificate> {
     private final String providingSerial;
     private final LocalDateTime startDate;
     private final LocalDateTime endDate;
+    private final String permissions;
 
-    public AccessCommand(String gainingSerial, String publicKey, String providingSerial, LocalDateTime startDate, LocalDateTime endDate) {
+    public AccessCommand(String gainingSerial, String publicKey, String providingSerial, LocalDateTime startDate, LocalDateTime endDate, String permissions) {
         checkArgument(!isNullOrEmpty(gainingSerial), "`gainingSerial` must not be empty");
         checkArgument(!isNullOrEmpty(publicKey), "`publicKey` must not be empty");
         checkArgument(!isNullOrEmpty(providingSerial), "`providingSerial` must not be empty");
         requireNonNull(startDate, "`startDate` must not be null");
         requireNonNull(endDate, "`endDate` must not be null");
         checkArgument(startDate.isBefore(endDate), "`startDate` must not be after `endDate`");
+        checkArgument(!isNullOrEmpty(permissions), "`permissions` must not be empty");
 
         this.gainingSerial = gainingSerial;
         this.publicKey = publicKey;
         this.providingSerial = providingSerial;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.permissions = permissions;
     }
 
     @Override
@@ -55,6 +58,7 @@ public class AccessCommand implements Command<Cryptotool.AccessCertificate> {
                 .add(providingSerial)
                 .add(startDateAsString)
                 .add(endDateAsString)
+                .add(permissions)
                 .build();
 
         String accessCertPrefix = "ACCESS CERT: ";

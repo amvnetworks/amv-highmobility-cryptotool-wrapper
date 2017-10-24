@@ -111,7 +111,7 @@ public class CryptotoolImplTest {
         Cryptotool.Signature signature = this.sut.generateSignature(anyMessage, keys.getPrivateKey())
                 .block();
 
-        Assert.fail("Should have thrown exception when generting signature for overlong message.");
+        Assert.fail("Should have thrown exception when generating signature for overlong message.");
     }
 
     @Test
@@ -248,7 +248,7 @@ public class CryptotoolImplTest {
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = startDate.plusYears(1);
 
-        Cryptotool.AccessCertificate accessCertificate = this.sut.createAccessCertificate(gainingSerial, publicKey, providingSerial, startDate, endDate)
+        Cryptotool.AccessCertificate accessCertificate = this.sut.createAccessCertificate(gainingSerial, publicKey, providingSerial, startDate, endDate, "10001F08000040")
                 .block();
         assertThat(accessCertificate, is(notNullValue()));
         assertThat(accessCertificate.getAccessCertificate(), is(notNullValue()));

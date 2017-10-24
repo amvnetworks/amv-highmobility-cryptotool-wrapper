@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public interface Cryptotool {
+    String ALL_PERMISSIONS_STRING_HEX = "1007FFFDFFEFFF";
 
     Mono<Version> version();
 
@@ -22,7 +23,7 @@ public interface Cryptotool {
 
     Mono<Validity> verifyHmac(String message, String key, String hmac);
 
-    default Mono<AccessCertificate> createAccessCertificate(
+    default Mono<AccessCertificate> createAccessCertificateWithAllPermissions(
             String gainingSerial,
             String publicKey,
             String providingSerial,
@@ -30,8 +31,7 @@ public interface Cryptotool {
             LocalDateTime endDate) {
         return createAccessCertificate(
                 gainingSerial, publicKey, providingSerial,
-                startDate, endDate,
-                Collections.emptyList());
+                startDate, endDate, ALL_PERMISSIONS_STRING_HEX);
     }
 
     Mono<AccessCertificate> createAccessCertificate(
@@ -40,7 +40,7 @@ public interface Cryptotool {
             String providingSerial,
             LocalDateTime startDate,
             LocalDateTime endDate,
-            Collection<String> permissions
+            String permissions
     );
 
     Mono<DeviceCertificate> createDeviceCertificate(

@@ -91,13 +91,14 @@ public class CryptotoolImpl implements Cryptotool {
                                                            String providingSerial,
                                                            LocalDateTime startDate,
                                                            LocalDateTime endDate,
-                                                           Collection<String> permissions) {
+                                                           String permissions) {
         return AccessCommand.builder()
                 .gainingSerial(gainingSerial)
                 .publicKey(publicKey)
                 .providingSerial(providingSerial)
                 .startDate(startDate)
                 .endDate(endDate)
+                .permissions(permissions)
                 .build()
                 .execute(binaryExecutor)
                 .timeout(options.getCommandTimeout())
