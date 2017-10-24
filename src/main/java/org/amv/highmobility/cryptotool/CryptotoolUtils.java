@@ -1,13 +1,13 @@
 package org.amv.highmobility.cryptotool;
 
 
-import com.google.common.base.Charsets;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
 
+import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.Random;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
@@ -40,13 +40,24 @@ public final class CryptotoolUtils {
         }
     }
 
-    public static final class TestUtils {
-        private TestUtils() {
+    public static final class SecureRandomUtils {
+        private static final Random RANDOM = new SecureRandom();
+
+        private SecureRandomUtils() {
             throw new UnsupportedOperationException();
         }
 
-        public static String generateRandomHexString(int byteCount) {
-            return Hex.encodeHexString(RandomUtils.nextBytes(byteCount));
+        public static byte[] nextBytes(final int count) {
+            checkArgument(count >= 0, "Count cannot be negative.");
+
+            final byte[] result = new byte[count];
+            RANDOM.nextBytes(result);
+            return result;
+        }
+
+        public static String generateRandomHexString(int count) {
+            checkArgument(count >= 0, "Count cannot be negative.");
+            return Hex.encodeHexString(nextBytes(count));
         }
 
         public static String generateRandomSerial() {
@@ -57,14 +68,13 @@ public final class CryptotoolUtils {
             return generateRandomHexString(12);
         }
 
-        public static String generateRandomIssuerInHex() {
-            return Hex.encodeHexString(generateRandomIssuer().getBytes(Charsets.UTF_8));
-        }
-
         public static String generateRandomIssuer() {
             return RandomStringUtils.randomAlphanumeric(4);
         }
-    }
 
+        public static String generateRandomIssuerInHex() {
+            return SecureRandomUtils.generateRandomHexString(4);
+        }
+    }
 
 }

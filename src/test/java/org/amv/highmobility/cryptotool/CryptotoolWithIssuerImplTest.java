@@ -1,6 +1,6 @@
 package org.amv.highmobility.cryptotool;
 
-import org.amv.highmobility.cryptotool.CryptotoolUtils.TestUtils;
+import org.amv.highmobility.cryptotool.CryptotoolUtils.SecureRandomUtils;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,7 +29,7 @@ public class CryptotoolWithIssuerImplTest {
         Cryptotool cryptotool = new CryptotoolImpl(cryptotoolOptions);
 
         CryptotoolWithIssuer.CertificateIssuer certificateIssuer = CryptotoolWithIssuer.CertificateIssuerImpl.builder()
-                .name(TestUtils.generateRandomIssuer())
+                .name(SecureRandomUtils.generateRandomIssuer())
                 .keys(cryptotool.generateKeys().block())
                 .build();
 
@@ -38,7 +38,7 @@ public class CryptotoolWithIssuerImplTest {
 
     @Test
     public void itShouldCreateAndVerifySignaturesWithSuccess() {
-        String anyMessage = TestUtils.generateRandomHexString(256);
+        String anyMessage = SecureRandomUtils.generateRandomHexString(256);
 
         Cryptotool.Signature signature = this.sut.generateSignature(anyMessage)
                 .block();
@@ -52,8 +52,8 @@ public class CryptotoolWithIssuerImplTest {
     @Test
     public void itShouldCreateDeviceCertificate() {
         Cryptotool.Keys keys = this.sut.generateKeys().block();
-        String appId = TestUtils.generateRandomAppId();
-        String serial = TestUtils.generateRandomSerial();
+        String appId = SecureRandomUtils.generateRandomAppId();
+        String serial = SecureRandomUtils.generateRandomSerial();
 
         Cryptotool.DeviceCertificate deviceCertificate = this.sut.createDeviceCertificate(appId, serial, keys.getPublicKey())
                 .block();
