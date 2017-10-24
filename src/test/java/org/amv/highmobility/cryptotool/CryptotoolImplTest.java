@@ -12,10 +12,13 @@ import org.junit.runner.RunWith;
 import org.slf4j.event.Level;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.junit.Assert.assertThat;
 
 @RunWith(JUnitParamsRunner.class)
@@ -58,7 +61,7 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    @Parameters({ "1", "2", "3" })
+    @Parameters({"1", "2", "3"})
     public void itShouldGenerateKeys(int index) {
         Cryptotool.Keys keys = this.sut.generateKeys()
                 .block();
@@ -71,7 +74,7 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    @Parameters({ "1","42", "256" })
+    @Parameters({"1", "42", "256"})
     public void itShouldGenerateSignatures(int byteCount) {
         Cryptotool.Keys keys = this.sut.generateKeys()
                 .block();
@@ -85,7 +88,7 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    @Parameters({ "1","42", "256" })
+    @Parameters({"1", "42", "256"})
     public void itShouldVerifySignature(int byteCount) {
         Cryptotool.Keys keys = this.sut.generateKeys()
                 .block();
@@ -115,7 +118,7 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    @Parameters({ "1","42", "255" })
+    @Parameters({"1", "42", "255"})
     public void itShouldFailVerifyingSignaturesWithMismatchingMessage(int byteCount) {
         checkArgument(byteCount <= 255);
 
@@ -135,7 +138,7 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    @Parameters({ "1", "2", "42", "128", "200", "256" })
+    @Parameters({"1", "2", "42", "128", "200", "256"})
     public void itShouldFailVerifyingSignaturesWithMismatchingKey(int byteCount) {
         Cryptotool.Keys keys = this.sut.generateKeys()
                 .block();
@@ -155,7 +158,7 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    @Parameters({ "1", "2", "42", "128", "200", "256" })
+    @Parameters({"1", "2", "42", "128", "200", "256"})
     public void itShouldGenerateHmac(int byteCount) {
         String key = SecureRandomUtils.generateRandomHexString(32);
         String anyMessage = SecureRandomUtils.generateRandomHexString(byteCount);
@@ -167,7 +170,7 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    @Parameters({ "1", "2", "42", "128", "200", "256" })
+    @Parameters({"1", "2", "42", "128", "200", "256"})
     public void itShouldVerifyHmac(int byteCount) {
         String key = SecureRandomUtils.generateRandomHexString(32);
         String anyMessage = SecureRandomUtils.generateRandomHexString(byteCount);
@@ -182,7 +185,7 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    @Parameters({ "1","42", "255" })
+    @Parameters({"1", "42", "255"})
     public void itShouldFailVerifyingHmacWithMismatchingMessage(int byteCount) {
         checkArgument(byteCount <= 255);
 
@@ -201,7 +204,7 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    @Parameters({ "1","42", "255" })
+    @Parameters({"1", "42", "255"})
     public void itShouldFailVerifyingHmacWithMismatchingKey(int byteCount) {
         checkArgument(byteCount <= 255);
 
@@ -220,7 +223,7 @@ public class CryptotoolImplTest {
     }
 
     @Test
-    @Parameters({ "1", "2", "3"})
+    @Parameters({"1", "2", "3"})
     public void itShouldCreateDeviceCertificate(int index) {
         Cryptotool.Keys keys = this.sut.generateKeys()
                 .block();
@@ -234,10 +237,23 @@ public class CryptotoolImplTest {
                 .block();
         assertThat(deviceCertificate, is(notNullValue()));
         assertThat(deviceCertificate.getDeviceCertificate(), is(notNullValue()));
+
+
+        String deviceCertificateInHex = deviceCertificate.getDeviceCertificate();
+
+        String issuerNameValue = deviceCertificateInHex.substring(0, 8);
+        String applicationIdValue = deviceCertificateInHex.substring(8, 32);
+        String deviceSerialNumberValue = deviceCertificateInHex.substring(32, 50);
+        String devicePublicKeyValue = deviceCertificateInHex.substring(50, deviceCertificateInHex.length());
+
+        assertThat(issuerNameValue, Matchers.is(equalToIgnoringCase(issuer)));
+        assertThat(applicationIdValue, Matchers.is(equalToIgnoringCase(appId)));
+        assertThat(deviceSerialNumberValue, Matchers.is(equalToIgnoringCase(serial)));
+        assertThat(devicePublicKeyValue, Matchers.is(equalToIgnoringCase(publicKey)));
     }
 
     @Test
-    @Parameters({ "1", "2", "3"})
+    @Parameters({"1", "2", "3"})
     public void itShouldCreateAccessCertificate(int index) {
         Cryptotool.Keys keys = this.sut.generateKeys()
                 .block();
@@ -247,13 +263,40 @@ public class CryptotoolImplTest {
         String providingSerial = SecureRandomUtils.generateRandomSerial();
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = startDate.plusYears(1);
+        String permissions = "10001F08000040";
 
-        Cryptotool.AccessCertificate accessCertificate = this.sut.createAccessCertificate(gainingSerial, publicKey, providingSerial, startDate, endDate, "10001F08000040")
+        Cryptotool.AccessCertificate accessCertificate = this.sut.createAccessCertificate(gainingSerial, publicKey, providingSerial, startDate, endDate, permissions)
                 .block();
         assertThat(accessCertificate, is(notNullValue()));
         assertThat(accessCertificate.getAccessCertificate(), is(notNullValue()));
         assertThat(accessCertificate.getValidityStartDate(), is(startDate));
         assertThat(accessCertificate.getValidityEndDate(), is(endDate));
+
+        /*
+        TODO: uncomment after integrating cryptotool v1.1 for windows
+        String accessCertificateInHex = accessCertificate.getAccessCertificate();
+
+        final String datePattern = "yyMMddHHmm";
+        final DateTimeFormatter dateTimeFormatter = new DateTimeFormatterBuilder()
+                .appendPattern(datePattern)
+                .toFormatter();
+
+        String gainingSerialValue = accessCertificateInHex.substring(0, 18);
+        String publicKeyValue = accessCertificateInHex.substring(18, 146);
+        String providingSerialValue = accessCertificateInHex.substring(146, 164);
+        String validFromValue = accessCertificateInHex.substring(164, 174 + datePattern.length());
+        String validUntilValue = accessCertificateInHex.substring(174, 184);
+        String permissionsSize = accessCertificateInHex.substring(184, 186);
+        String permissionsValue = accessCertificateInHex.substring(186, accessCertificateInHex.length());
+
+        assertThat(gainingSerialValue, is(gainingSerial.toUpperCase()));
+        assertThat(publicKeyValue, is(publicKey));
+        assertThat(providingSerialValue, is(providingSerial.toUpperCase()));
+        assertThat(validFromValue, is(startDate.format(dateTimeFormatter)));
+        assertThat(validUntilValue, is(endDate.format(dateTimeFormatter)));
+        assertThat(permissionsSize, is(notNullValue()));
+        assertThat(permissionsValue, is(permissions));
+        */
     }
 
 }
