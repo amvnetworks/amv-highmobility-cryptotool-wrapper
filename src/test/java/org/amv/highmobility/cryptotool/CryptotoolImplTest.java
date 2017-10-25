@@ -263,7 +263,18 @@ public class CryptotoolImplTest {
         String providingSerial = SecureRandomUtils.generateRandomSerial();
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = startDate.plusYears(1);
-        String permissions = "10001F08000040";
+        String expectedPermissions = "10001F08000040";
+        PermissionsImpl permissions = PermissionsImpl.builder()
+                .diagnosticsRead(true)
+                .doorLocksRead(true)
+                .doorLocksWrite(true)
+                .keyfobPositionRead(true)
+                .capabilitiesRead(true)
+                .vehicleStatusRead(true)
+                .chargeRead(true)
+                .build();
+
+        assertThat("sanity check", permissions.getPermissions(), is(equalToIgnoringCase(expectedPermissions)));
 
         Cryptotool.AccessCertificate accessCertificate = this.sut.createAccessCertificate(gainingSerial, publicKey, providingSerial, startDate, endDate, permissions)
                 .block();
@@ -271,9 +282,7 @@ public class CryptotoolImplTest {
         assertThat(accessCertificate.getAccessCertificate(), is(notNullValue()));
         assertThat(accessCertificate.getValidityStartDate(), is(startDate));
         assertThat(accessCertificate.getValidityEndDate(), is(endDate));
-
-        /*
-        TODO: uncomment after integrating cryptotool v1.1 for windows
+        
         String accessCertificateInHex = accessCertificate.getAccessCertificate();
 
         final String datePattern = "yyMMddHHmm";
@@ -284,7 +293,7 @@ public class CryptotoolImplTest {
         String gainingSerialValue = accessCertificateInHex.substring(0, 18);
         String publicKeyValue = accessCertificateInHex.substring(18, 146);
         String providingSerialValue = accessCertificateInHex.substring(146, 164);
-        String validFromValue = accessCertificateInHex.substring(164, 174 + datePattern.length());
+        String validFromValue = accessCertificateInHex.substring(164, 174);
         String validUntilValue = accessCertificateInHex.substring(174, 184);
         String permissionsSize = accessCertificateInHex.substring(184, 186);
         String permissionsValue = accessCertificateInHex.substring(186, accessCertificateInHex.length());
@@ -295,8 +304,7 @@ public class CryptotoolImplTest {
         assertThat(validFromValue, is(startDate.format(dateTimeFormatter)));
         assertThat(validUntilValue, is(endDate.format(dateTimeFormatter)));
         assertThat(permissionsSize, is(notNullValue()));
-        assertThat(permissionsValue, is(permissions));
-        */
+        assertThat(permissionsValue, is(expectedPermissions));
     }
 
 }
