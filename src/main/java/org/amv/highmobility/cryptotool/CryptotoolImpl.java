@@ -4,10 +4,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.amv.highmobility.cryptotool.command.*;
+import org.apache.commons.codec.binary.Hex;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
+import java.util.Arrays;
+import java.util.BitSet;
 
 import static java.util.Objects.requireNonNull;
 
@@ -161,4 +163,5 @@ public class CryptotoolImpl implements Cryptotool {
     public static class HmacImpl implements Hmac {
         private String hmac;
     }
+
 }

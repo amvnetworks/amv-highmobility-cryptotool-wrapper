@@ -3,14 +3,12 @@ package org.amv.highmobility.cryptotool;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public interface Cryptotool {
-    String ALL_PERMISSIONS_STRING_HEX = "1007FFFDFFEFFF";
+import static java.util.Objects.requireNonNull;
 
+public interface Cryptotool {
     Mono<Version> version();
 
     Mono<Keys> generateKeys();
@@ -23,15 +21,18 @@ public interface Cryptotool {
 
     Mono<Validity> verifyHmac(String message, String key, String hmac);
 
-    default Mono<AccessCertificate> createAccessCertificateWithAllPermissions(
+    default Mono<AccessCertificate> createAccessCertificate(
             String gainingSerial,
             String publicKey,
             String providingSerial,
             LocalDateTime startDate,
-            LocalDateTime endDate) {
+            LocalDateTime endDate,
+            Permissions permissions) {
+        requireNonNull(permissions);
+
         return createAccessCertificate(
                 gainingSerial, publicKey, providingSerial,
-                startDate, endDate, ALL_PERMISSIONS_STRING_HEX);
+                startDate, endDate, permissions.getPermissions());
     }
 
     Mono<AccessCertificate> createAccessCertificate(
@@ -87,6 +88,10 @@ public interface Cryptotool {
 
     interface DeviceCertificate {
         String getDeviceCertificate();
+    }
+
+    interface Permissions {
+        String getPermissions();
     }
 
     enum Validity {
