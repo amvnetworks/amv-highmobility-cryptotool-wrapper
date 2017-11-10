@@ -12,8 +12,6 @@ import org.junit.runner.RunWith;
 import org.slf4j.event.Level;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.hamcrest.CoreMatchers.is;
@@ -282,13 +280,8 @@ public class CryptotoolImplTest {
         assertThat(accessCertificate.getAccessCertificate(), is(notNullValue()));
         assertThat(accessCertificate.getValidityStartDate(), is(startDate));
         assertThat(accessCertificate.getValidityEndDate(), is(endDate));
-        
-        String accessCertificateInHex = accessCertificate.getAccessCertificate();
 
-        final String datePattern = "yyMMddHHmm";
-        final DateTimeFormatter dateTimeFormatter = new DateTimeFormatterBuilder()
-                .appendPattern(datePattern)
-                .toFormatter();
+        String accessCertificateInHex = accessCertificate.getAccessCertificate();
 
         String gainingSerialValue = accessCertificateInHex.substring(0, 18);
         String publicKeyValue = accessCertificateInHex.substring(18, 146);
@@ -301,8 +294,8 @@ public class CryptotoolImplTest {
         assertThat(gainingSerialValue, is(gainingSerial.toUpperCase()));
         assertThat(publicKeyValue, is(publicKey));
         assertThat(providingSerialValue, is(providingSerial.toUpperCase()));
-        assertThat(validFromValue, is(startDate.format(dateTimeFormatter)));
-        assertThat(validUntilValue, is(endDate.format(dateTimeFormatter)));
+        assertThat(validFromValue, is(equalToIgnoringCase(CryptotoolUtils.encodeAsHex(startDate))));
+        assertThat(validUntilValue, is(equalToIgnoringCase(CryptotoolUtils.encodeAsHex(endDate))));
         assertThat(permissionsSize, is(notNullValue()));
         assertThat(permissionsValue, is(expectedPermissions));
     }

@@ -6,6 +6,9 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Base64;
 import java.util.Random;
 
@@ -38,6 +41,19 @@ public final class CryptotoolUtils {
         } catch (DecoderException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static String encodeAsHex(LocalDateTime dateTime) {
+        ZonedDateTime zonedDateTime = dateTime.atZone(ZoneOffset.UTC);
+
+        byte[] bytes = new byte[5];
+        bytes[0] = (byte) (zonedDateTime.getYear() - 2000);
+        bytes[1] = (byte) (zonedDateTime.getMonthValue());
+        bytes[2] = (byte) (zonedDateTime.getDayOfMonth());
+        bytes[3] = (byte) (zonedDateTime.getHour());
+        bytes[4] = (byte) (zonedDateTime.getMinute());
+
+        return Hex.encodeHexString(bytes);
     }
 
     public static final class SecureRandomUtils {

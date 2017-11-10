@@ -2,15 +2,13 @@ package org.amv.highmobility.cryptotool.command;
 
 import com.google.common.collect.ImmutableList;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Value;
 import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool;
 import org.amv.highmobility.cryptotool.CryptotoolImpl;
+import org.amv.highmobility.cryptotool.CryptotoolUtils;
 import reactor.core.publisher.Flux;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -48,8 +46,8 @@ public class AccessCommand implements Command<Cryptotool.AccessCertificate> {
     public Flux<Cryptotool.AccessCertificate> execute(BinaryExecutor executor) {
         requireNonNull(executor);
 
-        String startDateAsString = startDate.format(DateTimeFormatter.ofPattern("YYMMddHHmm"));
-        String endDateAsString = endDate.format(DateTimeFormatter.ofPattern("YYMMddHHmm"));
+        String startDateAsString = CryptotoolUtils.encodeAsHex(startDate);
+        String endDateAsString = CryptotoolUtils.encodeAsHex(endDate);
 
         List<String> args = ImmutableList.<String>builder()
                 .add("access")
@@ -72,4 +70,5 @@ public class AccessCommand implements Command<Cryptotool.AccessCertificate> {
                         .validityEndDate(endDate)
                         .build());
     }
+
 }
