@@ -2,7 +2,6 @@ package org.amv.highmobility.cryptotool.command;
 
 import com.google.common.collect.ImmutableList;
 import lombok.Builder;
-import lombok.Value;
 import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool;
 import org.amv.highmobility.cryptotool.CryptotoolImpl;
@@ -39,7 +38,7 @@ public class SignCommand implements Command<Cryptotool.Signature> {
 
         String signPrefix = "SIGNATURE: ";
         return executor.execute(args)
-                .map(processResult -> parseValueWithPrefix(signPrefix, processResult.getCleanedOutput())
+                .map(processResult -> parseValueWithPrefix(signPrefix, processResult.getStdoutLines())
                         .orElseThrow(() -> new IllegalStateException("Cannot find signature on stdout",
                                 processResult.getException().orElse(null))))
                 .map(signature -> CryptotoolImpl.SignatureImpl.builder()

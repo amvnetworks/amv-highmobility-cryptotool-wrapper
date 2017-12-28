@@ -2,8 +2,6 @@ package org.amv.highmobility.cryptotool.command;
 
 import com.google.common.collect.ImmutableList;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Value;
 import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool;
 import org.amv.highmobility.cryptotool.CryptotoolImpl;
@@ -42,7 +40,7 @@ public class HmacCommand implements Command<Cryptotool.Hmac> {
 
         String signPrefix = "HMAC: ";
         return executor.execute(args)
-                .map(processResult -> parseValueWithPrefix(signPrefix, processResult.getCleanedOutput())
+                .map(processResult -> parseValueWithPrefix(signPrefix, processResult.getStdoutLines())
                         .orElseThrow(() -> new IllegalStateException("Cannot find hmac on stdout",
                                 processResult.getException().orElse(null))))
                 .map(hmac -> CryptotoolImpl.HmacImpl.builder()

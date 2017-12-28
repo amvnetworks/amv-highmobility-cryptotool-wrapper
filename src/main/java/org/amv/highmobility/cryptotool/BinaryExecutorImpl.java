@@ -66,7 +66,7 @@ public class BinaryExecutorImpl implements BinaryExecutor {
         return processWrapper.execute()
                 .doOnNext(processResult -> {
                     if (processResult.hasErrors() && log.isWarnEnabled()) {
-                        log.warn("Found output on stderr: \n{}", processResult.getErrors());
+                        log.warn("Found output on stderr: \n{}", processResult.getStderrLines());
                     }
                 });
     }
@@ -114,17 +114,18 @@ public class BinaryExecutorImpl implements BinaryExecutor {
                         Future<List<String>> stdout = executor.submit(new StreamBoozer(stdoutStream));
                         Future<List<String>> stderr = executor.submit(new StreamBoozer(stderrStream));
 
-                        ProcessResult processResult = ProcessResult.builder()
+                        ProcessResultImpl processResult = ProcessResultImpl.builder()
                                 .status(status)
                                 .output(stdout.get())
-                                .errors(stderr.get()).build();
+                                .errors(stderr.get())
+                                .build();
 
                         executor.shutdown();
 
                         if (log.isDebugEnabled()) {
                             log.debug("Command has terminated with status: " + processResult.getStatus());
-                            log.debug("Output:\n" + processResult.getOutput());
-                            log.debug("Error:\n" + processResult.getErrors());
+                            log.debug("Output:\n" + processResult.getStdoutLines());
+                            log.debug("Error:\n" + processResult.getStderrLines());
                         }
 
                         return processResult;

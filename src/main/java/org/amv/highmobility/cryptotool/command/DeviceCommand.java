@@ -2,8 +2,6 @@ package org.amv.highmobility.cryptotool.command;
 
 import com.google.common.collect.ImmutableList;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Value;
 import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool;
 import org.amv.highmobility.cryptotool.CryptotoolImpl;
@@ -47,7 +45,7 @@ public class DeviceCommand implements Command<Cryptotool.DeviceCertificate> {
 
         String deviceCertPrefix = "DEVICE CERT: ";
         return executor.execute(args)
-                .map(processResult -> parseValueWithPrefix(deviceCertPrefix, processResult.getCleanedOutput())
+                .map(processResult -> parseValueWithPrefix(deviceCertPrefix, processResult.getStdoutLines())
                         .orElseThrow(() -> new IllegalStateException("Cannot find device certificate on stdout",
                                 processResult.getException().orElse(null))))
                 .map(deviceCertificate -> CryptotoolImpl.DeviceCertificateImpl.builder()

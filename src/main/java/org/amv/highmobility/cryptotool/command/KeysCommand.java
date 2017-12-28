@@ -18,7 +18,7 @@ public class KeysCommand implements Command<Cryptotool.Keys> {
 
         return executor.execute("keys")
                 .map(processResult -> {
-                    List<String> stdOutput = processResult.getCleanedOutput();
+                    List<String> stdOutput = processResult.getStdoutLines();
 
                     String privateKey = CommandHelper.parseValueWithPrefix(privateKeyPrefix, stdOutput)
                             .orElseThrow(() -> new IllegalStateException("Cannot find private key on stdout",

@@ -2,7 +2,6 @@ package org.amv.highmobility.cryptotool.command;
 
 import com.google.common.collect.ImmutableList;
 import lombok.Builder;
-import lombok.Value;
 import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool;
 import reactor.core.publisher.Flux;
@@ -41,7 +40,7 @@ public class HmacVerifyCommand implements Command<Cryptotool.Validity> {
 
         String signPrefix = "HMAC VERIFY: ";
         return executor.execute(args)
-                .map(processResult -> processResult.getCleanedOutput().stream()
+                .map(processResult -> processResult.getStdoutLines().stream()
                         .filter(line -> line.startsWith(signPrefix))
                         .map(line -> line.replace(signPrefix, ""))
                         .map(String::trim)

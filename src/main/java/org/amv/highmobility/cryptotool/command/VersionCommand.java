@@ -1,7 +1,6 @@
 package org.amv.highmobility.cryptotool.command;
 
 import lombok.Builder;
-import lombok.Value;
 import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool.Version;
 import org.amv.highmobility.cryptotool.CryptotoolImpl;
@@ -16,7 +15,7 @@ public class VersionCommand implements Command<Version> {
     public Flux<Version> execute(BinaryExecutor executor) {
         String versionPrefix = "Cryptotool version";
         return executor.execute("-v")
-                .map(process -> parseValueWithPrefix(versionPrefix, process.getCleanedOutput())
+                .map(process -> parseValueWithPrefix(versionPrefix, process.getStdoutLines())
                         .orElseThrow(() -> new IllegalStateException("Cannot find version on stdout",
                                 process.getException().orElse(null))))
                 .map(version -> {

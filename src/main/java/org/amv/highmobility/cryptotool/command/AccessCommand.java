@@ -61,7 +61,7 @@ public class AccessCommand implements Command<Cryptotool.AccessCertificate> {
 
         String accessCertPrefix = "ACCESS CERT: ";
         return executor.execute(args)
-                .map(processResult -> parseValueWithPrefix(accessCertPrefix, processResult.getCleanedOutput())
+                .map(processResult -> parseValueWithPrefix(accessCertPrefix, processResult.getStdoutLines())
                         .orElseThrow(() -> new IllegalStateException("Cannot find access certificate on stdout",
                                 processResult.getException().orElse(null))))
                 .map(accessCertificate -> CryptotoolImpl.AccessCertificateImpl.builder()
