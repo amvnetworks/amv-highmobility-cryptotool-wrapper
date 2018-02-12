@@ -11,8 +11,7 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static java.util.Objects.requireNonNull;
-import static org.amv.highmobility.cryptotool.command.CommandHelper.*;
+import static org.amv.highmobility.cryptotool.command.CommandHelper.parseValueWithPrefix;
 
 @Builder(builderClassName = "Builder")
 public class DeviceCommand implements Command<Cryptotool.DeviceCertificate> {

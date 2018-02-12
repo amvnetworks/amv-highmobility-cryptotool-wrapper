@@ -3,7 +3,9 @@ package org.amv.highmobility.cryptotool.command;
 import lombok.Builder;
 import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool;
-import org.amv.highmobility.cryptotool.CryptotoolImpl;
+import org.amv.highmobility.cryptotool.KeysImpl;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
@@ -28,10 +30,14 @@ public class KeysCommand implements Command<Cryptotool.Keys> {
                             .orElseThrow(() -> new IllegalStateException("Cannot find public key on stdout",
                                     processResult.getException().orElse(null)));
 
-                    return CryptotoolImpl.KeysImpl.builder()
-                            .privateKey(privateKey)
-                            .publicKey(publicKey)
-                            .build();
+                    try {
+                        return KeysImpl.builder()
+                                .privateKey(Hex.decodeHex(privateKey.toCharArray()))
+                                .publicKey(Hex.decodeHex(publicKey.toCharArray()))
+                                .build();
+                    } catch (DecoderException e) {
+                        throw new RuntimeException(e);
+                    }
                 });
     }
 }

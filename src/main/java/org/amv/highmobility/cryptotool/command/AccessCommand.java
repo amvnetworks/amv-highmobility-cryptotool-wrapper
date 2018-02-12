@@ -2,10 +2,12 @@ package org.amv.highmobility.cryptotool.command;
 
 import com.google.common.collect.ImmutableList;
 import lombok.Builder;
+import org.amv.highmobility.cryptotool.AccessCertificateImpl;
 import org.amv.highmobility.cryptotool.BinaryExecutor;
 import org.amv.highmobility.cryptotool.Cryptotool;
-import org.amv.highmobility.cryptotool.CryptotoolImpl;
 import org.amv.highmobility.cryptotool.CryptotoolUtils;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
 import reactor.core.publisher.Flux;
 
 import java.time.LocalDateTime;
@@ -64,11 +66,17 @@ public class AccessCommand implements Command<Cryptotool.AccessCertificate> {
                 .map(processResult -> parseValueWithPrefix(accessCertPrefix, processResult.getStdoutLines())
                         .orElseThrow(() -> new IllegalStateException("Cannot find access certificate on stdout",
                                 processResult.getException().orElse(null))))
-                .map(accessCertificate -> CryptotoolImpl.AccessCertificateImpl.builder()
-                        .accessCertificate(accessCertificate)
-                        .validityStartDate(startDate)
-                        .validityEndDate(endDate)
-                        .build());
+                .map(accessCertificate -> {
+                    try {
+                        return AccessCertificateImpl.builder()
+                                .accessCertificate(Hex.decodeHex(accessCertificate.toCharArray()))
+                                .validityStartDate(startDate)
+                                .validityEndDate(endDate)
+                                .build();
+                    } catch (DecoderException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
     }
 
 }

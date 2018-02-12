@@ -63,17 +63,17 @@ public final class CryptotoolUtils {
             throw new UnsupportedOperationException();
         }
 
-        public static byte[] nextBytes(final int count) {
-            checkArgument(count >= 0, "Count cannot be negative.");
+        public static byte[] nextBytes(final int byteCount) {
+            checkArgument(byteCount >= 0, "Count cannot be negative.");
 
-            final byte[] result = new byte[count];
+            final byte[] result = new byte[byteCount];
             RANDOM.nextBytes(result);
             return result;
         }
 
-        public static String generateRandomHexString(int count) {
-            checkArgument(count >= 0, "Count cannot be negative.");
-            return Hex.encodeHexString(nextBytes(count));
+        public static String generateRandomHexString(int byteCount) {
+            checkArgument(byteCount >= 0, "Count cannot be negative.");
+            return Hex.encodeHexString(nextBytes(byteCount));
         }
 
         public static String generateRandomSerial() {

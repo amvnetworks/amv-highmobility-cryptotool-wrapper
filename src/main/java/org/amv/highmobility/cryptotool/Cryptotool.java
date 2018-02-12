@@ -52,9 +52,35 @@ public interface Cryptotool {
     );
 
     interface Keys {
+        /**
+         * @return private key in hex
+         */
         String getPrivateKey();
 
+        /**
+         * @return public key in hex
+         */
         String getPublicKey();
+
+        /**
+         * @return private key in base64
+         */
+        String getPrivateKeyBase64();
+
+        /**
+         * @return public key in base64
+         */
+        String getPublicKeyBase64();
+
+        /**
+         * @return raw private key
+         */
+        byte[] getPrivateKeyBytes();
+
+        /**
+         * @return raw public key
+         */
+        byte[] getPublicKeyBytes();
     }
 
     interface Version {
@@ -79,7 +105,11 @@ public interface Cryptotool {
     }
 
     interface AccessCertificate {
+        String getAccessCertificateBase64();
+
         String getAccessCertificate();
+
+        byte[] getAccessCertificateBytes();
 
         LocalDateTime getValidityStartDate();
 

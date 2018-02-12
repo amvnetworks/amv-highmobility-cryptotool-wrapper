@@ -66,6 +66,10 @@ dependencies {
     compile 'commons-codec:commons-codec:1.10'
     compile 'io.projectreactor:reactor-core:3.1.0.RELEASE'
 
+    compile 'com.highmobility:hmkit-oem:1.1.2'
+    compile 'com.highmobility:hmkit-crypto:1.1.10'
+
+
     compileOnly 'org.projectlombok:lombok:1.16.16'
 
     testCompile 'org.slf4j:slf4j-simple:1.7.25'

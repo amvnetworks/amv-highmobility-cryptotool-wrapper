@@ -4,12 +4,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.amv.highmobility.cryptotool.command.*;
-import org.apache.commons.codec.binary.Hex;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.BitSet;
 
 import static java.util.Objects.requireNonNull;
 
@@ -129,21 +126,6 @@ public class CryptotoolImpl implements Cryptotool {
         private String major;
         private String minor;
         private String patch;
-    }
-
-    @Getter
-    @Builder(builderClassName = "Builder")
-    public static class KeysImpl implements Keys {
-        private String privateKey;
-        private String publicKey;
-    }
-
-    @Getter
-    @Builder(builderClassName = "Builder")
-    public static class AccessCertificateImpl implements AccessCertificate {
-        private String accessCertificate;
-        private LocalDateTime validityStartDate;
-        private LocalDateTime validityEndDate;
     }
 
     @Getter

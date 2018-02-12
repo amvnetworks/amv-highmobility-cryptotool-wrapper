@@ -2,9 +2,7 @@ package org.amv.highmobility.cryptotool;
 
 import org.junit.Test;
 
-import static org.hamcrest.Matchers.equalToIgnoringCase;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
 public class PermissionsImplTest {

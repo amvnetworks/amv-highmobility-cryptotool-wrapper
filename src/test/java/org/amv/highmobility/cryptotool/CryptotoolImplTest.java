@@ -261,7 +261,7 @@ public class CryptotoolImplTest {
         String providingSerial = SecureRandomUtils.generateRandomSerial();
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = startDate.plusYears(1);
-        String expectedPermissions = "10001F08000040";
+        String expectedPermissions = "10001f08000040";
         PermissionsImpl permissions = PermissionsImpl.builder()
                 .diagnosticsRead(true)
                 .doorLocksRead(true)
@@ -291,9 +291,9 @@ public class CryptotoolImplTest {
         String permissionsSize = accessCertificateInHex.substring(184, 186);
         String permissionsValue = accessCertificateInHex.substring(186, accessCertificateInHex.length());
 
-        assertThat(gainingSerialValue, is(gainingSerial.toUpperCase()));
+        assertThat(gainingSerialValue, is(gainingSerial));
         assertThat(publicKeyValue, is(publicKey));
-        assertThat(providingSerialValue, is(providingSerial.toUpperCase()));
+        assertThat(providingSerialValue, is(providingSerial));
         assertThat(validFromValue, is(equalToIgnoringCase(CryptotoolUtils.encodeAsHex(startDate))));
         assertThat(validUntilValue, is(equalToIgnoringCase(CryptotoolUtils.encodeAsHex(endDate))));
         assertThat(permissionsSize, is(notNullValue()));

@@ -4,8 +4,6 @@ import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.codec.binary.Hex;
 
-import java.util.Arrays;
-
 import static com.google.common.base.Preconditions.checkState;
 
 @Getter

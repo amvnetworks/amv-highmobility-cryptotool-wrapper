@@ -2,7 +2,6 @@ package org.amv.highmobility.cryptotool;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Value;
 
 import java.io.File;
 
