@@ -19,15 +19,15 @@ import static org.amv.highmobility.cryptotool.command.CommandHelper.parseValueWi
 @Builder(builderClassName = "Builder")
 public class AccessCommand implements Command<Cryptotool.AccessCertificate> {
     private final String gainingSerial;
-    private final String publicKey;
+    private final String gainingPublicKey;
     private final String providingSerial;
     private final LocalDateTime startDate;
     private final LocalDateTime endDate;
     private final String permissions;
 
-    public AccessCommand(String gainingSerial, String publicKey, String providingSerial, LocalDateTime startDate, LocalDateTime endDate, String permissions) {
+    public AccessCommand(String gainingSerial, String gainingPublicKey, String providingSerial, LocalDateTime startDate, LocalDateTime endDate, String permissions) {
         checkArgument(!isNullOrEmpty(gainingSerial), "`gainingSerial` must not be empty");
-        checkArgument(!isNullOrEmpty(publicKey), "`publicKey` must not be empty");
+        checkArgument(!isNullOrEmpty(gainingPublicKey), "`gainingPublicKey` must not be empty");
         checkArgument(!isNullOrEmpty(providingSerial), "`providingSerial` must not be empty");
         requireNonNull(startDate, "`startDate` must not be null");
         requireNonNull(endDate, "`endDate` must not be null");
@@ -35,7 +35,7 @@ public class AccessCommand implements Command<Cryptotool.AccessCertificate> {
         checkArgument(!isNullOrEmpty(permissions), "`permissions` must not be empty");
 
         this.gainingSerial = gainingSerial;
-        this.publicKey = publicKey;
+        this.gainingPublicKey = gainingPublicKey;
         this.providingSerial = providingSerial;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -51,12 +51,13 @@ public class AccessCommand implements Command<Cryptotool.AccessCertificate> {
 
         List<String> args = ImmutableList.<String>builder()
                 .add("access")
-                .add(gainingSerial)
-                .add(publicKey)
                 .add(providingSerial)
+                .add(gainingSerial)
+                .add(gainingPublicKey)
                 .add(startDateAsString)
                 .add(endDateAsString)
                 .add(permissions)
+                .add("-ac0")
                 .build();
 
         String accessCertPrefix = "ACCESS CERT: ";

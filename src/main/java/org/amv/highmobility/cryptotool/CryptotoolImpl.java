@@ -89,14 +89,14 @@ public class CryptotoolImpl implements Cryptotool {
 
     @Override
     public Mono<AccessCertificate> createAccessCertificate(String gainingSerial,
-                                                           String publicKey,
+                                                           String gainingPublicKey,
                                                            String providingSerial,
                                                            LocalDateTime startDate,
                                                            LocalDateTime endDate,
                                                            String permissions) {
         return AccessCommand.builder()
                 .gainingSerial(gainingSerial)
-                .publicKey(publicKey)
+                .gainingPublicKey(gainingPublicKey)
                 .providingSerial(providingSerial)
                 .startDate(startDate)
                 .endDate(endDate)
