@@ -17,7 +17,7 @@ import static java.util.Objects.requireNonNull;
 import static org.amv.highmobility.cryptotool.command.CommandHelper.parseValueWithPrefix;
 
 @Builder(builderClassName = "Builder")
-public class AccessCommand implements Command<Cryptotool.AccessCertificate> {
+public class AccessCommandV0 implements Command<Cryptotool.AccessCertificate> {
     private final String gainingSerial;
     private final String gainingPublicKey;
     private final String providingSerial;
@@ -25,7 +25,7 @@ public class AccessCommand implements Command<Cryptotool.AccessCertificate> {
     private final LocalDateTime endDate;
     private final String permissions;
 
-    public AccessCommand(String gainingSerial, String gainingPublicKey, String providingSerial, LocalDateTime startDate, LocalDateTime endDate, String permissions) {
+    public AccessCommandV0(String gainingSerial, String gainingPublicKey, String providingSerial, LocalDateTime startDate, LocalDateTime endDate, String permissions) {
         checkArgument(!isNullOrEmpty(gainingSerial), "`gainingSerial` must not be empty");
         checkArgument(!isNullOrEmpty(gainingPublicKey), "`gainingPublicKey` must not be empty");
         checkArgument(!isNullOrEmpty(providingSerial), "`providingSerial` must not be empty");
