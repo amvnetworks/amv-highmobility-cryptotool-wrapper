@@ -16,7 +16,7 @@ plugins {
     id 'findbugs'
     id 'checkstyle'
     id 'com.jfrog.bintray' version '1.7.3'
-    id 'io.franzbecker.gradle-lombok' version '1.8'
+    id 'io.franzbecker.gradle-lombok' version '1.14'
     id 'com.github.ben-manes.versions' version '0.14.0'
 }
 
@@ -43,6 +43,7 @@ gradle.taskGraph.whenReady { graph ->
         findbugsMain.enabled = false
         checkstyleMain.enabled = false
         javadoc.enabled = false
+        delombok.enabled = false
     }
 }
 
@@ -66,7 +67,7 @@ dependencies {
     compile 'commons-codec:commons-codec:1.10'
     compile 'io.projectreactor:reactor-core:3.1.0.RELEASE'
 
-    compileOnly 'org.projectlombok:lombok:1.16.16'
+    compileOnly 'org.projectlombok:lombok:1.18.4'
 
     testCompile 'org.slf4j:slf4j-simple:1.7.25'
 
@@ -76,8 +77,8 @@ dependencies {
 }
 
 lombok {
-    version = '1.16.16'
-    sha256 = 'fbf682c7ff113e5187a9c4b4cbd7a8ad782abd8ccff91b9fa7289a4a6aa8c19a'
+    version = '1.18.4'
+    sha256 '39f3922deb679b1852af519eb227157ef2dd0a21eec3542c8ce1b45f2df39742'
 }
 
 task delombok(type: DelombokTask, dependsOn: compileJava) {
