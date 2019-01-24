@@ -188,7 +188,7 @@ public class CryptotoolImplTest {
         checkArgument(byteCount <= 255);
 
         String key = SecureRandomUtils.generateRandomHexString(32);
-        String anyMessage = SecureRandomUtils.generateRandomHexString(255);
+        String anyMessage = SecureRandomUtils.generateRandomHexString(byteCount);
 
         Cryptotool.Hmac hmac = this.sut.generateHmac(anyMessage, key)
                 .block();

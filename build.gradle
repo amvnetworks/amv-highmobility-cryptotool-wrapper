@@ -13,7 +13,7 @@ plugins {
     id 'nebula.info' version '3.6.0'
     id 'nebula.release' version '6.0.0'
     id 'nebula.lint' version '6.8.0'
-    id 'findbugs'
+    id 'com.github.spotbugs' version '1.6.5'
     id 'checkstyle'
     id 'com.jfrog.bintray' version '1.7.3'
     id 'io.franzbecker.gradle-lombok' version '1.14'
@@ -22,7 +22,7 @@ plugins {
 
 apply plugin: 'java'
 apply plugin: 'maven'
-apply plugin: 'findbugs'
+apply plugin: 'com.github.spotbugs'
 apply plugin: 'checkstyle'
 apply plugin: 'jacoco'
 apply plugin: 'com.jfrog.bintray'
@@ -40,7 +40,7 @@ gradle.taskGraph.whenReady { graph ->
     def enableAdditionalLongRunningTasks = !isMinimalBuild
 
     if (!enableAdditionalLongRunningTasks) {
-        findbugsMain.enabled = false
+        spotbugsMain.enabled = false
         checkstyleMain.enabled = false
         javadoc.enabled = false
         delombok.enabled = false
@@ -60,6 +60,8 @@ repositories {
 }
 
 dependencies {
+    spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.8.0'
+
     compile 'org.slf4j:slf4j-api:1.7.25'
     compile 'com.google.guava:guava:21.0'
     compile 'org.apache.commons:commons-lang3:3.5'
@@ -110,10 +112,19 @@ checkstyle {
     reportsDir = rootProject.file("$buildDir/reports/checkstyle")
 }
 
-findbugs {
+spotbugs  {
+    toolVersion = '3.1.11'
     effort = 'min'
-    ignoreFailures = false
+    showProgress = true
+    ignoreFailures = true
     sourceSets = [sourceSets.main]
+}
+
+tasks.withType(com.github.spotbugs.SpotBugsTask) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
 }
 
 jar.doFirst {
