@@ -6,6 +6,7 @@ import lombok.Getter;
 import org.apache.commons.codec.binary.Hex;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -56,5 +57,33 @@ public interface CryptotoolWithIssuer extends Cryptotool {
 
     default Mono<DeviceCertificate> createDeviceCertificate(String appId, String serial, String publicKey) {
         return createDeviceCertificate(getCertificateIssuer().getNameInHex(), appId, serial, publicKey);
+    }
+
+    default Mono<AccessCertificate> createAccessCertificateV1(
+            String providingSerial,
+            String gainingSerial,
+            String gainingPublicKey,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            Permissions permissions) {
+        requireNonNull(permissions);
+
+        return createAccessCertificate(1, providingSerial, gainingSerial, gainingPublicKey,
+                startDate, endDate, permissions.getPermissions());
+    }
+
+    default Mono<AccessCertificate> createAccessCertificate(
+            int version,
+            String providingSerial,
+            String gainingSerial,
+            String gainingPublicKey,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            String permissions
+    ) {
+
+        return createAccessCertificate(version,
+                this.getCertificateIssuer().getNameInHex(), providingSerial, gainingSerial, gainingPublicKey,
+                startDate, endDate, permissions);
     }
 }
