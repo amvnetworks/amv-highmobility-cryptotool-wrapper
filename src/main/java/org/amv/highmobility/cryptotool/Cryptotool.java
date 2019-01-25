@@ -21,24 +21,40 @@ public interface Cryptotool {
 
     Mono<Validity> verifyHmac(String message, String key, String hmac);
 
-    default Mono<AccessCertificate> createAccessCertificate(
-            String gainingSerial,
-            String publicKey,
+    default Mono<AccessCertificate> createAccessCertificateV0(
             String providingSerial,
+            String gainingSerial,
+            String gainingPublicKey,
             LocalDateTime startDate,
             LocalDateTime endDate,
             Permissions permissions) {
         requireNonNull(permissions);
 
-        return createAccessCertificate(
-                gainingSerial, publicKey, providingSerial,
+        return createAccessCertificate(0,
+                null, providingSerial, gainingSerial, gainingPublicKey,
+                startDate, endDate, permissions.getPermissions());
+    }
+    default Mono<AccessCertificate> createAccessCertificateV1(
+            String issuer,
+            String providingSerial,
+            String gainingSerial,
+            String gainingPublicKey,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            Permissions permissions) {
+        requireNonNull(permissions);
+
+        return createAccessCertificate(1,
+                issuer, providingSerial, gainingSerial, gainingPublicKey,
                 startDate, endDate, permissions.getPermissions());
     }
 
     Mono<AccessCertificate> createAccessCertificate(
-            String gainingSerial,
-            String publicKey,
+            int version,
+            String issuer,
             String providingSerial,
+            String gainingSerial,
+            String gainingPublicKey,
             LocalDateTime startDate,
             LocalDateTime endDate,
             String permissions

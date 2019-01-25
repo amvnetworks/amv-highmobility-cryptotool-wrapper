@@ -8,6 +8,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
@@ -85,26 +86,6 @@ public class CryptotoolImpl implements Cryptotool {
     }
 
     @Override
-    public Mono<AccessCertificate> createAccessCertificate(String gainingSerial,
-                                                           String gainingPublicKey,
-                                                           String providingSerial,
-                                                           LocalDateTime startDate,
-                                                           LocalDateTime endDate,
-                                                           String permissions) {
-        return AccessCommandV0.builder()
-                .gainingSerial(gainingSerial)
-                .gainingPublicKey(gainingPublicKey)
-                .providingSerial(providingSerial)
-                .startDate(startDate)
-                .endDate(endDate)
-                .permissions(permissions)
-                .build()
-                .execute(binaryExecutor)
-                .timeout(options.getCommandTimeout())
-                .single();
-    }
-
-    @Override
     public Mono<DeviceCertificate> createDeviceCertificate(String issuer,
                                                            String appId,
                                                            String serial,
@@ -118,6 +99,65 @@ public class CryptotoolImpl implements Cryptotool {
                 .execute(binaryExecutor)
                 .timeout(options.getCommandTimeout())
                 .single();
+    }
+
+    @Override
+    public Mono<AccessCertificate> createAccessCertificate(int version,
+                                                           String issuer,
+                                                           String providingSerial,
+                                                           String gainingSerial,
+                                                           String gainingPublicKey,
+                                                           LocalDateTime startDate,
+                                                           LocalDateTime endDate,
+                                                           String permissions) {
+        checkArgument(version == 0 || version == 1, "`version` has invalid value");
+
+        Command<Cryptotool.AccessCertificate> command;
+        if (version == 0) {
+            command = createAccessCommandV0(providingSerial, gainingSerial, gainingPublicKey, startDate, endDate, permissions);
+        } else {
+            command = createAccessCommandV1(issuer, providingSerial, gainingSerial, gainingPublicKey, startDate, endDate, permissions);
+        }
+
+        return command
+                .execute(binaryExecutor)
+                .timeout(options.getCommandTimeout())
+                .single();
+    }
+
+
+    private Command<Cryptotool.AccessCertificate> createAccessCommandV0(String providingSerial,
+                                                                        String gainingSerial,
+                                                                        String gainingPublicKey,
+                                                                        LocalDateTime startDate,
+                                                                        LocalDateTime endDate,
+                                                                        String permissions) {
+        return AccessCommandV0.builder()
+                .providingSerial(providingSerial)
+                .gainingSerial(gainingSerial)
+                .gainingPublicKey(gainingPublicKey)
+                .startDate(startDate)
+                .endDate(endDate)
+                .permissions(permissions)
+                .build();
+    }
+
+    private Command<Cryptotool.AccessCertificate> createAccessCommandV1(String issuer,
+                                                                        String providingSerial,
+                                                                        String gainingSerial,
+                                                                        String gainingPublicKey,
+                                                                        LocalDateTime startDate,
+                                                                        LocalDateTime endDate,
+                                                                        String permissions) {
+        return AccessCommandV1.builder()
+                .issuer(issuer)
+                .providingSerial(providingSerial)
+                .gainingSerial(gainingSerial)
+                .gainingPublicKey(gainingPublicKey)
+                .startDate(startDate)
+                .endDate(endDate)
+                .permissions(permissions)
+                .build();
     }
 
     @Getter

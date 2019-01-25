@@ -252,13 +252,13 @@ public class CryptotoolImplTest {
 
     @Test
     @Parameters({"1", "2", "3"})
-    public void itShouldCreateAccessCertificate(int index) {
+    public void itShouldCreateAccessCertificateV0(int index) {
         Cryptotool.Keys keys = this.sut.generateKeys()
                 .block();
 
-        String gainingSerial = SecureRandomUtils.generateRandomSerial();
-        String publicKey = keys.getPublicKey();
         String providingSerial = SecureRandomUtils.generateRandomSerial();
+        String gainingSerial = SecureRandomUtils.generateRandomSerial();
+        String gainingPublicKey = keys.getPublicKey();
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = startDate.plusYears(1);
         String expectedPermissions = "10001F08000040";
@@ -274,7 +274,8 @@ public class CryptotoolImplTest {
 
         assertThat("sanity check", permissions.getPermissions(), is(equalToIgnoringCase(expectedPermissions)));
 
-        Cryptotool.AccessCertificate accessCertificate = this.sut.createAccessCertificate(gainingSerial, publicKey, providingSerial, startDate, endDate, permissions)
+        Cryptotool.AccessCertificate accessCertificate = this.sut
+                .createAccessCertificateV0(providingSerial, gainingSerial, gainingPublicKey, startDate, endDate, permissions)
                 .block();
         assertThat(accessCertificate, is(notNullValue()));
         assertThat(accessCertificate.getAccessCertificate(), is(notNullValue()));
@@ -292,7 +293,64 @@ public class CryptotoolImplTest {
         String permissionsValue = accessCertificateInHex.substring(186, accessCertificateInHex.length());
 
         assertThat(gainingSerialValue, is(gainingSerial.toUpperCase()));
-        assertThat(publicKeyValue, is(publicKey));
+        assertThat(publicKeyValue, is(gainingPublicKey));
+        assertThat(providingSerialValue, is(providingSerial.toUpperCase()));
+        assertThat(validFromValue, is(equalToIgnoringCase(CryptotoolUtils.encodeAsHex(startDate))));
+        assertThat(validUntilValue, is(equalToIgnoringCase(CryptotoolUtils.encodeAsHex(endDate))));
+        assertThat(permissionsSize, is(notNullValue()));
+        assertThat(permissionsValue, is(expectedPermissions));
+    }
+
+
+    @Test
+    @Parameters({"1", "2", "3"})
+    public void itShouldCreateAccessCertificateV1(int index) {
+        Cryptotool.Keys keys = this.sut.generateKeys()
+                .block();
+
+        String issuer = SecureRandomUtils.generateRandomIssuerInHex();
+        String providingSerial = SecureRandomUtils.generateRandomSerial();
+        String gainingSerial = SecureRandomUtils.generateRandomSerial();
+        String gainingPublicKey = keys.getPublicKey();
+        LocalDateTime startDate = LocalDateTime.now();
+        LocalDateTime endDate = startDate.plusYears(1);
+        String expectedPermissions = "10001F08000040";
+        PermissionsImpl permissions = PermissionsImpl.builder()
+                .diagnosticsRead(true)
+                .doorLocksRead(true)
+                .doorLocksWrite(true)
+                .keyfobPositionRead(true)
+                .capabilitiesRead(true)
+                .vehicleStatusRead(true)
+                .chargeRead(true)
+                .build();
+
+        assertThat("sanity check", permissions.getPermissions(), is(equalToIgnoringCase(expectedPermissions)));
+
+        Cryptotool.AccessCertificate accessCertificate = this.sut
+                .createAccessCertificateV1(issuer, providingSerial, gainingSerial, gainingPublicKey, startDate, endDate, permissions)
+                .block();
+        assertThat(accessCertificate, is(notNullValue()));
+        assertThat(accessCertificate.getAccessCertificate(), is(notNullValue()));
+        assertThat(accessCertificate.getValidityStartDate(), is(startDate));
+        assertThat(accessCertificate.getValidityEndDate(), is(endDate));
+
+        String accessCertificateInHex = accessCertificate.getAccessCertificate();
+
+        String versionValue = accessCertificateInHex.substring(0, 2);
+        String issuerValue = accessCertificateInHex.substring(2, 10);
+        String providingSerialValue = accessCertificateInHex.substring(10, 28);
+        String gainingSerialValue = accessCertificateInHex.substring(28, 46);
+        String publicKeyValue = accessCertificateInHex.substring(46, 174);
+        String validFromValue = accessCertificateInHex.substring(174, 184);
+        String validUntilValue = accessCertificateInHex.substring(184, 194);
+        String permissionsSize = accessCertificateInHex.substring(194, 196);
+        String permissionsValue = accessCertificateInHex.substring(196, accessCertificateInHex.length());
+
+        assertThat(versionValue, is("01"));
+        assertThat(issuerValue, is(issuer.toUpperCase()));
+        assertThat(gainingSerialValue, is(gainingSerial.toUpperCase()));
+        assertThat(publicKeyValue, is(gainingPublicKey));
         assertThat(providingSerialValue, is(providingSerial.toUpperCase()));
         assertThat(validFromValue, is(equalToIgnoringCase(CryptotoolUtils.encodeAsHex(startDate))));
         assertThat(validUntilValue, is(equalToIgnoringCase(CryptotoolUtils.encodeAsHex(endDate))));
